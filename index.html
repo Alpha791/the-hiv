@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>Frigates Market Place - Kenya's Premier E-commerce with Live Selling</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>TheHive- Modern Marketplace</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -13,593 +13,496 @@
             box-sizing: border-box;
         }
         body {
-            background: linear-gradient(135deg, #fef9e8 0%, #fff5e6 100%);
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
-        .card-hover {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-hover:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 30px -12px rgba(0,0,0,0.15);
-        }
-        .live-badge {
-            animation: pulse-red 1.5s infinite;
-        }
-        @keyframes pulse-red {
-            0% { opacity: 1; background-color: #dc2626; box-shadow: 0 0 0 0 rgba(220,38,38,0.4);}
-            70% { opacity: 0.9; background-color: #ef4444; box-shadow: 0 0 0 8px rgba(220,38,38,0);}
-            100% { opacity: 1; background-color: #dc2626; box-shadow: 0 0 0 0 rgba(220,38,38,0);}
-        }
-        .video-container video {
-            width: 100%;
-            max-height: 280px;
-            object-fit: cover;
-            border-radius: 20px;
-            background: #1a1a2e;
-        }
-        .product-img {
-            height: 180px;
-            object-fit: cover;
-            width: 100%;
-            transition: transform 0.3s ease;
-        }
-        .product-img:hover {
-            transform: scale(1.05);
-        }
-        .camera-switch-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: rgba(0,0,0,0.8);
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
-            padding: 12px;
-            border-radius: 50px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-radius: 24px;
+            transition: all 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .live-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .video-wrapper {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            background: #000;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .product-card:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        .mobile-menu {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+            border-radius: 20px 20px 0 0;
+            z-index: 1000;
         }
         @media (max-width: 768px) {
-            .video-container video {
-                max-height: 240px;
+            .mobile-menu {
+                display: flex;
+                justify-content: space-around;
+                padding: 12px 20px;
             }
-            .product-img {
-                height: 160px;
-            }
-        }
-        @media (max-width: 640px) {
-            .video-container video {
-                max-height: 200px;
+            .desktop-nav {
+                display: none;
             }
         }
-        .toast-notification {
+        @media (min-width: 769px) {
+            .mobile-menu {
+                display: none;
+            }
+        }
+        .camera-selector {
             position: fixed;
             bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 10px 20px;
+            right: 20px;
+            z-index: 999;
+            background: rgba(0,0,0,0.8);
             border-radius: 50px;
-            z-index: 1000;
-            font-size: 14px;
-            pointer-events: none;
-            white-space: nowrap;
-        }
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #f59e0b;
-            border-radius: 4px;
+            padding: 10px 15px;
         }
     </style>
 </head>
-<body class="font-sans antialiased">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-        <div class="flex flex-col md:flex-row justify-between items-center border-b border-amber-200 pb-4 mb-6">
-            <div class="flex items-center space-x-3">
-                <div class="bg-green-100 p-2 rounded-full">
-                    <i class="fas fa-map-marker-alt text-green-700 text-xl"></i>
+<body class="antialiased">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="glass-card p-4 mb-6">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-gradient-to-r from-purple-600 to-pink-600 p-2 rounded-xl">
+                        <i class="fas fa-rocket text-white text-2xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800">TheHive<span class="text-purple-600">Kenya</span></h1>
                 </div>
-                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-800">Frigates<span class="text-amber-600">Market</span> <span class="text-xs bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-full ml-2">Live Sellers</span></h1>
-            </div>
-            <div class="flex space-x-3 mt-3 md:mt-0">
-                <button id="showMarketplaceBtn" class="bg-white border-2 border-gray-300 px-5 py-2 rounded-full font-semibold hover:bg-gray-50 hover:border-amber-400 transition shadow-sm"><i class="fas fa-store"></i> Marketplace</button>
-                <button id="showSellerCenterBtn" class="bg-gradient-to-r from-amber-600 to-amber-700 text-white px-5 py-2 rounded-full font-semibold hover:from-amber-700 hover:to-amber-800 transition shadow-md"><i class="fas fa-user-plus"></i> Seller Center</button>
+                <div class="desktop-nav space-x-3">
+                    <button id="homeBtn" class="px-5 py-2 rounded-full font-semibold bg-purple-600 text-white"><i class="fas fa-home"></i> Home</button>
+                    <button id="marketBtn" class="px-5 py-2 rounded-full font-semibold bg-gray-200 text-gray-700"><i class="fas fa-store"></i> Market</button>
+                    <button id="sellBtn" class="px-5 py-2 rounded-full font-semibold bg-gray-200 text-gray-700"><i class="fas fa-chalkboard-user"></i> Sell Live</button>
+                    <button id="profileBtn" class="px-5 py-2 rounded-full font-semibold bg-gray-200 text-gray-700"><i class="fas fa-user"></i> Profile</button>
+                </div>
             </div>
         </div>
 
-        <div id="globalLiveSection" class="mb-8 hidden bg-black rounded-2xl overflow-hidden shadow-2xl border-2 border-red-500">
-            <div class="bg-gradient-to-r from-red-600 via-red-500 to-orange-500 px-4 py-3 flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <span class="live-badge inline-block w-3 h-3 bg-red-500 rounded-full"></span>
-                    <span class="font-bold text-white text-sm md:text-base"><i class="fas fa-video"></i> 🔴 LIVE SELLING NOW</span>
-                </div>
-                <span id="liveSellerName" class="text-white text-xs md:text-sm font-bold bg-black/40 px-3 py-1 rounded-full">Seller Name</span>
-            </div>
-            <div class="p-4 bg-black/95">
-                <div class="video-container relative">
-                    <video id="buyerLiveVideo" autoplay playsinline class="w-full rounded-xl border-2 border-white/30 shadow-lg"></video>
-                </div>
-                <div id="liveSellerContact" class="mt-3 text-white bg-amber-800/60 p-3 rounded-xl text-sm flex items-center justify-between flex-wrap gap-2 backdrop-blur-sm">
-                    <span><i class="fas fa-phone-alt text-green-400"></i> <strong>Seller Contact:</strong></span>
-                    <span class="font-mono bg-white text-gray-900 px-4 py-1.5 rounded-full font-bold"></span>
-                    <a id="whatsappLink" href="#" target="_blank" class="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-full text-xs transition"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-                </div>
-                <p class="text-xs text-gray-300 mt-2 text-center"><i class="fas fa-info-circle"></i> Watch live demos, call seller directly or chat on WhatsApp</p>
-            </div>
-        </div>
-
-        <div id="marketplaceSection">
-            <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                <div>
-                    <h2 class="text-2xl md:text-3xl font-bold text-gray-800"><i class="fas fa-shopping-bag text-amber-600"></i> Tuko Soko - Shop Kenyan Sellers</h2>
-                    <p class="text-gray-500 text-sm md:text-base">✓ 200+ trusted sellers ✓ View contacts ✓ Live video deals ✓ Front/Back camera</p>
-                </div>
-                <div class="relative w-full md:w-80">
-                    <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
-                    <input type="text" id="searchProduct" placeholder="Search products or seller..." class="pl-11 pr-4 py-2.5 border-2 border-gray-200 rounded-full w-full focus:outline-none focus:border-amber-500 transition bg-white">
+        <div id="homePage" class="space-y-6">
+            <div class="glass-card p-8 text-center">
+                <h2 class="text-4xl font-bold text-gray-800 mb-3">Welcome to TheHive Kenya</h2>
+                <p class="text-gray-600 text-lg">Africa's fastest growing marketplace with live video selling</p>
+                <div class="mt-6 flex justify-center space-x-4">
+                    <button class="bg-purple-600 text-white px-6 py-2 rounded-full font-semibold exploreBtn"><i class="fas fa-shopping-cart"></i> Explore Products</button>
+                    <button class="bg-pink-600 text-white px-6 py-2 rounded-full font-semibold startSellingBtn"><i class="fas fa-video"></i> Start Selling Live</button>
                 </div>
             </div>
-            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
-            <div id="noProductsMsg" class="text-center py-16 hidden">
-                <i class="fas fa-box-open text-6xl text-gray-300"></i>
-                <p class="text-gray-500 mt-3 text-lg">No products found. Sellers are adding items!</p>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="glass-card p-6 text-center">
+                    <i class="fas fa-users text-4xl text-purple-600 mb-3"></i>
+                    <h3 class="text-xl font-bold">500+ Sellers</h3>
+                    <p class="text-gray-600">Trusted vendors across Kenya</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <i class="fas fa-video text-4xl text-pink-600 mb-3"></i>
+                    <h3 class="text-xl font-bold">Live Selling</h3>
+                    <p class="text-gray-600">Real-time product demos</p>
+                </div>
+                <div class="glass-card p-6 text-center">
+                    <i class="fas fa-mobile-alt text-4xl text-green-600 mb-3"></i>
+                    <h3 class="text-xl font-bold">Mobile Ready</h3>
+                    <p class="text-gray-600">Front & back camera support</p>
+                </div>
             </div>
         </div>
 
-        <div id="sellerSection" class="hidden">
-            <div class="bg-white rounded-2xl shadow-2xl p-6 md:p-8">
-                <div id="sellerAuthArea">
-                    <div class="flex gap-4 border-b mb-6">
-                        <button id="showLoginTab" class="py-2.5 px-5 font-bold text-amber-700 border-b-2 border-amber-500 transition">🔐 Login</button>
-                        <button id="showRegisterTab" class="py-2.5 px-5 font-semibold text-gray-500 hover:text-amber-600 transition">📝 Register New Seller</button>
-                    </div>
-                    <div id="loginForm">
-                        <div class="space-y-4 max-w-md mx-auto">
-                            <input type="email" id="loginEmail" placeholder="Email Address" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-amber-500 focus:outline-none">
-                            <input type="password" id="loginPassword" placeholder="Password" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-amber-500 focus:outline-none">
-                            <button id="doLoginBtn" class="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white font-bold py-3 rounded-xl w-full transition shadow-lg"><i class="fas fa-sign-in-alt"></i> Login to Dashboard</button>
-                        </div>
-                    </div>
-                    <div id="registerForm" class="hidden">
-                        <div class="space-y-4 max-w-md mx-auto">
-                            <input type="text" id="regStoreName" placeholder="Store/Business Name" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-amber-500 focus:outline-none">
-                            <input type="text" id="regSellerName" placeholder="Full Name" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-amber-500 focus:outline-none">
-                            <input type="email" id="regEmail" placeholder="Email Address" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-amber-500 focus:outline-none">
-                            <input type="tel" id="regMobile" placeholder="Mobile Number (e.g. 0712345678)" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-amber-500 focus:outline-none">
-                            <input type="password" id="regPassword" placeholder="Password" class="w-full border-2 border-gray-200 p-3 rounded-xl focus:border-amber-500 focus:outline-none">
-                            <button id="doRegisterBtn" class="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 rounded-xl w-full transition shadow-lg"><i class="fas fa-user-plus"></i> Create Account & Start Selling</button>
-                        </div>
+        <div id="marketPage" class="hidden">
+            <div class="glass-card p-6 mb-6">
+                <div class="flex flex-wrap gap-4 justify-between items-center">
+                    <h2 class="text-2xl font-bold">Marketplace</h2>
+                    <div class="relative">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        <input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border rounded-full w-64">
                     </div>
                 </div>
+            </div>
+            <div id="productsContainer" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        </div>
 
-                <div id="sellerDashboardPanel" class="hidden mt-8">
-                    <div class="flex flex-wrap justify-between items-center border-b pb-4 mb-5">
+        <div id="livePage" class="hidden">
+            <div class="glass-card p-6">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold">Live Video Studio</h2>
+                    <p class="text-gray-600">Connect with buyers in real-time</p>
+                </div>
+                
+                <div id="authRequired" class="text-center p-8">
+                    <i class="fas fa-lock text-5xl text-gray-400 mb-3"></i>
+                    <p class="text-gray-600 mb-4">Please login or register to start live selling</p>
+                    <button id="gotoAuthBtn" class="bg-purple-600 text-white px-6 py-2 rounded-full"><i class="fas fa-sign-in-alt"></i> Login / Register</button>
+                </div>
+
+                <div id="liveStudio" class="hidden">
+                    <div class="grid md:grid-cols-2 gap-6">
                         <div>
-                            <h3 class="text-2xl font-bold text-gray-800"><i class="fas fa-store text-amber-600"></i> <span id="dashboardStoreName"></span></h3>
-                            <p class="text-gray-600 mt-1"><i class="fas fa-user-check text-green-600"></i> Welcome, <span id="dashboardSellerName" class="font-semibold"></span> | <i class="fas fa-phone-alt"></i> <span id="dashboardMobile" class="font-mono"></span></p>
-                        </div>
-                        <button id="logoutSellerBtn" class="bg-red-100 text-red-700 px-5 py-2 rounded-xl hover:bg-red-200 transition font-semibold"><i class="fas fa-sign-out-alt"></i> Logout</button>
-                    </div>
-
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div class="bg-gradient-to-br from-amber-50 to-orange-50 p-5 rounded-2xl shadow-md">
-                            <h4 class="font-bold text-xl mb-4 text-gray-800"><i class="fas fa-camera text-amber-600"></i> Upload Product</h4>
-                            <input type="text" id="prodName" placeholder="Product name" class="w-full border-2 border-gray-200 p-2.5 rounded-xl mb-2 focus:border-amber-500 focus:outline-none">
-                            <textarea id="prodDesc" placeholder="Description" rows="2" class="w-full border-2 border-gray-200 p-2.5 rounded-xl mb-2 focus:border-amber-500 focus:outline-none"></textarea>
-                            <input type="number" id="prodPrice" placeholder="Price (KES)" class="w-full border-2 border-gray-200 p-2.5 rounded-xl mb-2 focus:border-amber-500 focus:outline-none">
-                            <input type="file" id="prodImage" accept="image/*" class="w-full text-sm border-2 border-gray-200 p-2 rounded-xl mb-2 bg-white">
-                            <button id="addProductBtn" class="bg-amber-600 hover:bg-amber-700 text-white w-full py-2.5 rounded-xl mt-2 transition font-semibold"><i class="fas fa-plus-circle"></i> Add Product</button>
-                        </div>
-
-                        <div class="md:col-span-2 bg-white p-5 rounded-2xl border-2 border-gray-100 shadow-md">
-                            <h4 class="font-bold text-xl mb-3 text-gray-800"><i class="fas fa-boxes text-amber-600"></i> Your Products</h4>
-                            <div id="sellerProductsList" class="max-h-96 overflow-y-auto space-y-3"></div>
-                        </div>
-                    </div>
-
-                    <div class="mt-8 bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 text-white shadow-2xl">
-                        <h4 class="text-2xl font-bold flex items-center gap-3 mb-4"><i class="fas fa-broadcast-tower text-red-500 text-3xl"></i> Live Video Selling</h4>
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <div>
-                                <div class="video-container bg-black rounded-2xl overflow-hidden shadow-xl">
-                                    <video id="sellerPreviewVideo" autoplay playsinline muted class="w-full"></video>
-                                </div>
-                                <div class="flex flex-wrap gap-3 mt-4">
-                                    <button id="switchCameraBtn" class="bg-purple-600 hover:bg-purple-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition shadow"><i class="fas fa-sync-alt"></i> Switch Camera</button>
-                                    <button id="startBroadcastBtn" class="bg-red-600 hover:bg-red-700 px-6 py-2.5 rounded-xl font-bold transition shadow"><i class="fas fa-circle"></i> Go LIVE</button>
-                                    <button id="stopBroadcastBtn" class="bg-gray-600 hover:bg-gray-700 px-6 py-2.5 rounded-xl font-bold transition shadow" disabled><i class="fas fa-stop"></i> End Live</button>
-                                    <button id="recordVideoBtn" class="bg-blue-600 hover:bg-blue-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition shadow"><i class="fas fa-record-vinyl"></i> Record</button>
-                                    <button id="stopRecordBtn" class="bg-yellow-600 hidden px-4 py-2.5 rounded-xl text-sm font-semibold transition shadow" disabled><i class="fas fa-square"></i> Stop</button>
-                                </div>
-                                <p class="text-xs text-gray-300 mt-3 text-center"><i class="fas fa-mobile-alt"></i> Use "Switch Camera" to toggle front/back camera on mobile devices</p>
+                            <div class="video-wrapper bg-black rounded-xl" style="height: 300px">
+                                <video id="localVideo" autoplay playsinline muted class="w-full h-full"></video>
                             </div>
-                            <div class="bg-gray-800/50 p-4 rounded-xl backdrop-blur-sm border border-gray-700">
-                                <p class="font-bold text-lg mb-2"><i class="fas fa-chalkboard-user text-amber-400"></i> Live Selling Tips (Kenyan Market)</p>
-                                <ul class="text-sm space-y-2 list-disc pl-5 text-gray-200">
-                                    <li>Switch to back camera to show product details clearly</li>
-                                    <li>Share your M-Pesa Till/Buy Good number in chat</li>
-                                    <li>Your mobile contact is automatically shown to buyers</li>
-                                    <li>Demonstrate product quality in real-time</li>
-                                </ul>
-                                <div class="mt-4 text-xs bg-black/50 p-3 rounded-lg">
-                                    <span id="liveStatusText" class="text-red-400 font-mono">⚫ Offline - Click Go LIVE to start</span>
-                                </div>
+                            <div class="flex gap-3 mt-4 justify-center">
+                                <button id="switchCamBtn" class="bg-gray-800 text-white px-4 py-2 rounded-full"><i class="fas fa-sync-alt"></i> Switch Camera</button>
+                                <button id="startLiveBtn" class="bg-red-600 text-white px-6 py-2 rounded-full font-bold"><i class="fas fa-circle"></i> Start Live</button>
+                                <button id="stopLiveBtn" class="bg-gray-600 text-white px-6 py-2 rounded-full font-bold hidden"><i class="fas fa-stop"></i> Stop Live</button>
+                            </div>
+                            <p class="text-sm text-gray-500 text-center mt-3"><i class="fas fa-info-circle"></i> Toggle between front/back camera for product display</p>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl">
+                            <h3 class="font-bold text-lg mb-3">Live Tips</h3>
+                            <ul class="space-y-2 text-sm">
+                                <li><i class="fas fa-check-circle text-green-600"></i> Switch to back camera to show product details</li>
+                                <li><i class="fas fa-check-circle text-green-600"></i> Share your M-Pesa number in chat</li>
+                                <li><i class="fas fa-check-circle text-green-600"></i> Engage with viewers in real-time</li>
+                            </ul>
+                            <div id="liveStatus" class="mt-4 p-3 bg-gray-800 text-white rounded-lg text-center">
+                                <span id="liveStatusText">⚫ Offline</span>
                             </div>
                         </div>
+                    </div>
+                    <div id="activeBroadcast" class="mt-6 hidden">
+                        <div class="bg-green-100 border border-green-400 p-3 rounded-lg text-center">
+                            <i class="fas fa-broadcast-tower text-red-600"></i> You are LIVE! Buyers can see you now
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="profilePage" class="hidden">
+            <div class="glass-card p-6">
+                <h2 class="text-2xl font-bold mb-6">Account</h2>
+                <div id="profileLoggedOut" class="text-center p-8">
+                    <i class="fas fa-user-circle text-6xl text-gray-400 mb-4"></i>
+                    <button id="showLoginModalBtn" class="bg-purple-600 text-white px-6 py-2 rounded-full"><i class="fas fa-sign-in-alt"></i> Login</button>
+                    <button id="showRegisterModalBtn" class="bg-green-600 text-white px-6 py-2 rounded-full ml-3"><i class="fas fa-user-plus"></i> Register</button>
+                </div>
+                <div id="profileLoggedIn" class="hidden">
+                    <div class="text-center">
+                        <i class="fas fa-store text-6xl text-purple-600 mb-3"></i>
+                        <h3 id="userStoreName" class="text-xl font-bold"></h3>
+                        <p id="userFullName" class="text-gray-600"></p>
+                        <p id="userMobile" class="text-gray-500 mt-2"><i class="fas fa-phone"></i> <span></span></p>
+                        <button id="logoutBtn" class="mt-4 bg-red-500 text-white px-4 py-2 rounded-full"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </div>
+                    <div class="mt-6">
+                        <h3 class="font-bold text-lg mb-3">My Products</h3>
+                        <div id="myProductsList" class="space-y-3 max-h-96 overflow-y-auto"></div>
+                        <button id="showAddProductForm" class="mt-4 bg-green-600 text-white px-4 py-2 rounded-full w-full"><i class="fas fa-plus"></i> Add New Product</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="camera-switch-btn">
-        <i class="fas fa-camera-retro text-white text-xl"></i>
+    <div class="mobile-menu">
+        <button class="mobile-home text-purple-600"><i class="fas fa-home text-2xl"></i></button>
+        <button class="mobile-market"><i class="fas fa-store text-2xl text-gray-500"></i></button>
+        <button class="mobile-live"><i class="fas fa-video text-2xl text-gray-500"></i></button>
+        <button class="mobile-profile"><i class="fas fa-user text-2xl text-gray-500"></i></button>
     </div>
 
+    <div class="camera-selector hidden" id="cameraHint">
+        <i class="fas fa-camera-retro text-white"></i>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const API_URL = 'https://kenyamarket-backend.up.railway.app/api';
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
         
-        let sellers = [];
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentUser = null;
         let products = [];
-        let currentSellerId = null;
-        let activeLiveSellerId = null;
-        let activeLiveStream = null;
-        let mediaRecorder = null;
-        let recordedChunks = [];
-        let sellerCameraStream = null;
-        let currentFacingMode = 'user';
-
-        async function loadData() {
-            try {
-                const sellersRes = await fetch(`${API_URL}/sellers`);
-                const productsRes = await fetch(`${API_URL}/products`);
-                const liveRes = await fetch(`${API_URL}/live/active`);
-                sellers = await sellersRes.json();
-                products = await productsRes.json();
-                const liveData = await liveRes.json();
-                activeLiveSellerId = liveData.activeSellerId;
-                if(activeLiveSellerId && liveData.streamActive) {
-                    document.getElementById('globalLiveSection').classList.remove('hidden');
-                    const seller = sellers.find(s => s.id === activeLiveSellerId);
-                    if(seller) {
-                        document.getElementById('liveSellerName').innerText = `${seller.storeName} (${seller.fullName})`;
-                        const contactSpan = document.querySelector('#liveSellerContact span:last-child');
-                        if(contactSpan) contactSpan.innerText = `📞 ${seller.mobile}`;
-                        const whatsappLink = document.getElementById('whatsappLink');
-                        whatsappLink.href = `https://wa.me/${seller.mobile.replace(/^0/, '254')}`;
-                    }
-                }
-            } catch(e) { console.error(e); }
-            if(sellers.length === 0) {
-                sellers = [
-                    { id: "s1", storeName: "Mama Mboga Fresh", fullName: "Grace Wanjiku", email: "mama@kenyamarket.com", password: "pass123", mobile: "0712345678" },
-                    { id: "s2", storeName: "TechPesa Electronics", fullName: "James Otieno", email: "james@techpesa.com", password: "pass123", mobile: "0722334455" },
-                    { id: "s3", storeName: "Kiondo Crafts", fullName: "Aisha Mwangi", email: "aisha@kiondo.com", password: "pass123", mobile: "0744556677" }
-                ];
-            }
-            if(products.length === 0 && sellers.length) {
-                products = [
-                    { id: "p1", sellerId: "s1", name: "Fresh Sukuma Wiki", desc: "Organic bunch from farm", price: 50, imageData: "https://picsum.photos/id/127/200/150" },
-                    { id: "p2", sellerId: "s1", name: "Tomatoes 1kg", desc: "Fresh from Murang'a", price: 120, imageData: "https://picsum.photos/id/108/200/150" },
-                    { id: "p3", sellerId: "s2", name: "Power Bank 20000mAh", desc: "Fast charging, dual USB", price: 1850, imageData: "https://picsum.photos/id/0/200/150" },
-                    { id: "p4", sellerId: "s3", name: "Handwoven Basket", desc: "Maasai pattern, eco-friendly", price: 750, imageData: "https://picsum.photos/id/96/200/150" }
-                ];
+        let liveStream = null;
+        let currentCamera = 'user';
+        
+        function showPage(page) {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('marketPage').classList.add('hidden');
+            document.getElementById('livePage').classList.add('hidden');
+            document.getElementById('profilePage').classList.add('hidden');
+            document.getElementById(`${page}Page`).classList.remove('hidden');
+        }
+        
+        async function loadProducts() {
+            const { data } = await supabase.from('products').select('*, sellers(full_name, store_name, mobile)');
+            if(data) {
+                products = data;
+                renderProducts();
             }
         }
-
-        function getSellerById(id) { return sellers.find(s => s.id === id); }
-
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.innerText = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 2000);
-        }
-
-        function renderMarketplace(searchTerm = "") {
-            const container = document.getElementById('productsGrid');
-            const noMsg = document.getElementById('noProductsMsg');
-            let filtered = [...products];
-            if(searchTerm) {
-                const term = searchTerm.toLowerCase();
-                filtered = products.filter(p => {
-                    const seller = getSellerById(p.sellerId);
-                    const sellerMatch = seller && (seller.storeName.toLowerCase().includes(term) || seller.fullName.toLowerCase().includes(term));
-                    return p.name.toLowerCase().includes(term) || sellerMatch;
-                });
-            }
+        
+        function renderProducts() {
+            const container = document.getElementById('productsContainer');
+            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+            const filtered = products.filter(p => p.name.toLowerCase().includes(searchTerm) || p.description.toLowerCase().includes(searchTerm));
+            
             if(filtered.length === 0) {
-                container.innerHTML = '';
-                noMsg.classList.remove('hidden');
+                container.innerHTML = '<div class="col-span-full text-center py-10"><i class="fas fa-box-open text-4xl text-gray-400"></i><p class="text-gray-500">No products found</p></div>';
                 return;
             }
-            noMsg.classList.add('hidden');
-            container.innerHTML = filtered.map(prod => {
-                const seller = getSellerById(prod.sellerId);
-                if(!seller) return '';
-                return `
-                    <div class="bg-white rounded-2xl shadow-lg overflow-hidden card-hover transition cursor-pointer">
-                        <img src="${prod.imageData}" class="product-img" onerror="this.src='https://picsum.photos/id/20/200/150'" alt="${prod.name}">
-                        <div class="p-5">
-                            <h3 class="font-bold text-xl text-gray-800">${prod.name}</h3>
-                            <p class="text-gray-500 text-sm mt-1">${prod.desc.substring(0,60)}</p>
-                            <div class="flex justify-between items-center mt-3">
-                                <span class="text-amber-700 font-extrabold text-lg">KES ${prod.price.toLocaleString()}</span>
-                                <button class="viewSellerBtn bg-blue-50 text-blue-600 text-sm px-3 py-1.5 rounded-full hover:bg-blue-100 transition" data-seller-id="${seller.id}">View Seller</button>
-                            </div>
-                            <div class="mt-3 border-t pt-3 text-xs text-gray-500 flex justify-between">
-                                <span><i class="fas fa-store"></i> ${seller.storeName}</span>
-                                <span><i class="fas fa-phone-alt text-green-600"></i> ${seller.mobile}</span>
-                            </div>
-                        </div>
+            
+            container.innerHTML = filtered.map(p => `
+                <div class="product-card p-4">
+                    <img src="${p.image_url || 'https://picsum.photos/300/200'}" class="w-full h-48 object-cover rounded-lg mb-3">
+                    <h3 class="font-bold text-lg">${p.name}</h3>
+                    <p class="text-gray-500 text-sm">${p.description?.substring(0, 80)}</p>
+                    <div class="flex justify-between items-center mt-3">
+                        <span class="text-purple-600 font-bold text-xl">KES ${p.price}</span>
+                        <button class="viewSellerBtn text-blue-600 text-sm" data-seller="${p.seller_id}">View Seller</button>
                     </div>
-                `;
-            }).join('');
-            document.querySelectorAll('.viewSellerBtn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const sellerId = btn.dataset.sellerId;
-                    const seller = getSellerById(sellerId);
-                    if(seller) alert(`🏪 ${seller.storeName}\n👤 ${seller.fullName}\n📞 Mobile: ${seller.mobile}\n✉️ ${seller.email}\n📍 Kenyan Seller - Call/WhatsApp for deals!`);
-                });
-            });
-        }
-
-        function renderSellerProducts() {
-            if(!currentSellerId) return;
-            const sellerProds = products.filter(p => p.sellerId === currentSellerId);
-            const container = document.getElementById('sellerProductsList');
-            if(sellerProds.length === 0) {
-                container.innerHTML = '<div class="text-gray-400 text-center p-6 bg-gray-50 rounded-xl">No products yet. Add your first item above!</div>';
-                return;
-            }
-            container.innerHTML = sellerProds.map(prod => `
-                <div class="flex gap-3 bg-gray-50 p-3 rounded-xl items-center hover:shadow-md transition">
-                    <img src="${prod.imageData}" class="w-16 h-16 rounded-lg object-cover" onerror="this.src='https://picsum.photos/id/13/80/80'">
-                    <div class="flex-1">
-                        <p class="font-semibold text-gray-800">${prod.name}</p>
-                        <p class="text-xs text-gray-500">KES ${prod.price}</p>
+                    <div class="mt-2 text-xs text-gray-500">
+                        <i class="fas fa-store"></i> ${p.sellers?.store_name || 'Seller'}
                     </div>
-                    <button class="deleteProdBtn text-red-500 hover:text-red-700 transition text-xl" data-prod-id="${prod.id}"><i class="fas fa-trash-alt"></i></button>
                 </div>
             `).join('');
-            document.querySelectorAll('.deleteProdBtn').forEach(btn => {
-                btn.addEventListener('click', async (e) => {
-                    const prodId = btn.dataset.prodId;
-                    products = products.filter(p => p.id !== prodId);
-                    renderSellerProducts();
-                    renderMarketplace(document.getElementById('searchProduct')?.value || '');
-                    showToast('Product deleted successfully');
+            
+            document.querySelectorAll('.viewSellerBtn').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const sellerId = btn.dataset.seller;
+                    const { data } = await supabase.from('sellers').select('*').eq('id', sellerId).single();
+                    if(data) {
+                        alert(`🏪 ${data.store_name}\n👤 ${data.full_name}\n📞 ${data.mobile}\n✉️ ${data.email}`);
+                    }
                 });
             });
         }
-
-        async function switchCamera() {
-            if(sellerCameraStream) {
-                sellerCameraStream.getTracks().forEach(track => track.stop());
+        
+        async function loadUserProducts() {
+            if(!currentUser) return;
+            const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id);
+            const container = document.getElementById('myProductsList');
+            if(!data || data.length === 0) {
+                container.innerHTML = '<p class="text-gray-500 text-center">No products yet. Add your first product!</p>';
+                return;
             }
-            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            container.innerHTML = data.map(p => `
+                <div class="flex gap-3 bg-gray-50 p-3 rounded-lg">
+                    <img src="${p.image_url || 'https://picsum.photos/60/60'}" class="w-16 h-16 rounded-lg object-cover">
+                    <div class="flex-1">
+                        <p class="font-semibold">${p.name}</p>
+                        <p class="text-sm text-gray-600">KES ${p.price}</p>
+                    </div>
+                    <button class="deleteProduct text-red-500" data-id="${p.id}"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.deleteProduct').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    await supabase.from('products').delete().eq('id', btn.dataset.id);
+                    loadUserProducts();
+                    loadProducts();
+                });
+            });
+        }
+        
+        async function startLiveStream() {
+            if(!currentUser) {
+                alert('Please login first');
+                showPage('profile');
+                return;
+            }
             try {
+                if(liveStream) liveStream.getTracks().forEach(t => t.stop());
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { exact: currentFacingMode } },
+                    video: { facingMode: { exact: currentCamera } },
                     audio: true
                 });
-                sellerCameraStream = stream;
-                const previewVideo = document.getElementById('sellerPreviewVideo');
-                previewVideo.srcObject = stream;
-                if(activeLiveStream && activeLiveSellerId === currentSellerId) {
-                    if(activeLiveStream) activeLiveStream.getTracks().forEach(t => t.stop());
-                    activeLiveStream = stream;
-                }
-                showToast(currentFacingMode === 'environment' ? 'Back camera active' : 'Front camera active');
-            } catch(err) {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                sellerCameraStream = stream;
-                const previewVideo = document.getElementById('sellerPreviewVideo');
-                previewVideo.srcObject = stream;
-            }
-        }
-
-        async function stopBroadcast() {
-            if(activeLiveStream) {
-                activeLiveStream.getTracks().forEach(track => track.stop());
-                activeLiveStream = null;
-            }
-            activeLiveSellerId = null;
-            const sellerVideo = document.getElementById('sellerPreviewVideo');
-            document.getElementById('liveStatusText').innerHTML = '⚫ Offline - Click Go LIVE to start';
-            document.getElementById('startBroadcastBtn').disabled = false;
-            document.getElementById('stopBroadcastBtn').disabled = true;
-            document.getElementById('globalLiveSection').classList.add('hidden');
-            const buyerVideo = document.getElementById('buyerLiveVideo');
-            if(buyerVideo.srcObject) buyerVideo.srcObject = null;
-            showToast('Live broadcast ended');
-        }
-
-        async function startBroadcast() {
-            if(!currentSellerId) { alert("Please login as seller first"); return; }
-            try {
-                if(sellerCameraStream) {
-                    sellerCameraStream.getTracks().forEach(t => t.stop());
-                }
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: { exact: currentFacingMode } },
-                    audio: true
-                });
-                sellerCameraStream = stream;
-                const previewVideo = document.getElementById('sellerPreviewVideo');
-                previewVideo.srcObject = stream;
-                if(activeLiveStream) activeLiveStream.getTracks().forEach(t => t.stop());
-                activeLiveStream = stream;
-                activeLiveSellerId = currentSellerId;
-                document.getElementById('liveStatusText').innerHTML = '🔴 LIVE NOW - Broadcasting to buyers';
-                document.getElementById('startBroadcastBtn').disabled = true;
-                document.getElementById('stopBroadcastBtn').disabled = false;
+                liveStream = stream;
+                document.getElementById('localVideo').srcObject = stream;
+                document.getElementById('startLiveBtn').classList.add('hidden');
+                document.getElementById('stopLiveBtn').classList.remove('hidden');
+                document.getElementById('activeBroadcast').classList.remove('hidden');
+                document.getElementById('liveStatusText').innerHTML = '🔴 LIVE NOW - Broadcasting';
+                document.getElementById('liveStatusText').className = 'text-red-400';
                 
-                const seller = getSellerById(currentSellerId);
-                document.getElementById('globalLiveSection').classList.remove('hidden');
-                document.getElementById('liveSellerName').innerText = `${seller.storeName} (${seller.fullName})`;
-                document.querySelector('#liveSellerContact span:last-child').innerText = `📞 ${seller.mobile}`;
-                const whatsappLink = document.getElementById('whatsappLink');
-                whatsappLink.href = `https://wa.me/${seller.mobile.replace(/^0/, '254')}`;
-                const buyerVideo = document.getElementById('buyerLiveVideo');
-                buyerVideo.srcObject = stream;
-                buyerVideo.muted = false;
-                buyerVideo.play();
-                showToast('🎥 You are now LIVE! Buyers can see you');
+                await supabase.from('live_sessions').insert({
+                    seller_id: currentUser.id,
+                    status: 'live',
+                    started_at: new Date()
+                });
             } catch(err) {
-                alert("Camera/Mic access denied. Please allow permissions for live selling.");
-                console.error(err);
+                alert('Camera access denied');
             }
-        }
-
-        function startRecording() {
-            if(!activeLiveStream) { alert("Please start live broadcast first"); return; }
-            recordedChunks = [];
-            mediaRecorder = new MediaRecorder(activeLiveStream);
-            mediaRecorder.ondataavailable = (e) => { if(e.data.size > 0) recordedChunks.push(e.data); };
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `livesale_${Date.now()}.webm`;
-                a.click();
-                URL.revokeObjectURL(url);
-                showToast('Recording saved!');
-            };
-            mediaRecorder.start();
-            document.getElementById('recordVideoBtn').classList.add('hidden');
-            document.getElementById('stopRecordBtn').classList.remove('hidden');
-            showToast('Recording started...');
         }
         
-        function stopRecording() {
-            if(mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                document.getElementById('recordVideoBtn').classList.remove('hidden');
-                document.getElementById('stopRecordBtn').classList.add('hidden');
-                showToast('Recording stopped');
+        async function stopLiveStream() {
+            if(liveStream) {
+                liveStream.getTracks().forEach(t => t.stop());
+                liveStream = null;
+            }
+            document.getElementById('localVideo').srcObject = null;
+            document.getElementById('startLiveBtn').classList.remove('hidden');
+            document.getElementById('stopLiveBtn').classList.add('hidden');
+            document.getElementById('activeBroadcast').classList.add('hidden');
+            document.getElementById('liveStatusText').innerHTML = '⚫ Offline';
+            
+            await supabase.from('live_sessions').update({ status: 'ended', ended_at: new Date() }).eq('seller_id', currentUser.id).eq('status', 'live');
+        }
+        
+        async function switchCamera() {
+            currentCamera = currentCamera === 'user' ? 'environment' : 'user';
+            if(liveStream) {
+                await stopLiveStream();
+                await startLiveStream();
+            } else if(document.getElementById('localVideo').srcObject) {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentCamera } }, audio: true });
+                document.getElementById('localVideo').srcObject = stream;
+                if(liveStream) liveStream.getTracks().forEach(t => t.stop());
+                liveStream = stream;
             }
         }
-
-        function loadSellerDashboard() {
-            if(!currentSellerId) return;
-            const seller = getSellerById(currentSellerId);
-            if(seller) {
-                document.getElementById('dashboardStoreName').innerText = seller.storeName;
-                document.getElementById('dashboardSellerName').innerText = seller.fullName;
-                document.getElementById('dashboardMobile').innerText = seller.mobile;
-                document.getElementById('sellerAuthArea').classList.add('hidden');
-                document.getElementById('sellerDashboardPanel').classList.remove('hidden');
-                renderSellerProducts();
-            }
-        }
-
-        function logoutSeller() {
-            if(activeLiveSellerId === currentSellerId) stopBroadcast();
-            currentSellerId = null;
-            document.getElementById('sellerAuthArea').classList.remove('hidden');
-            document.getElementById('sellerDashboardPanel').classList.add('hidden');
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('registerForm').classList.add('hidden');
-            document.getElementById('showLoginTab').classList.add('border-b-2', 'border-amber-500', 'text-amber-700');
-            document.getElementById('showRegisterTab').classList.remove('border-b-2', 'border-amber-500', 'text-amber-700');
-            renderMarketplace(document.getElementById('searchProduct')?.value || '');
-            showToast('Logged out successfully');
-        }
-
-        function registerSeller(storeName, fullName, email, mobile, password) {
-            if(sellers.find(s => s.email === email)) { alert("Email already exists!"); return false; }
-            const newId = "seller_" + Date.now() + Math.floor(Math.random()*10000);
-            sellers.push({ id: newId, storeName, fullName, email, password, mobile });
-            alert("✅ Registration successful! Please login.");
-            return true;
-        }
-
-        document.getElementById('showMarketplaceBtn').addEventListener('click', () => {
-            document.getElementById('marketplaceSection').classList.remove('hidden');
-            document.getElementById('sellerSection').classList.add('hidden');
-            renderMarketplace(document.getElementById('searchProduct').value);
-        });
-        document.getElementById('showSellerCenterBtn').addEventListener('click', () => {
-            document.getElementById('marketplaceSection').classList.add('hidden');
-            document.getElementById('sellerSection').classList.remove('hidden');
-            if(!currentSellerId) {
-                document.getElementById('sellerAuthArea').classList.remove('hidden');
-                document.getElementById('sellerDashboardPanel').classList.add('hidden');
+        
+        document.getElementById('homeBtn').addEventListener('click', () => showPage('home'));
+        document.getElementById('marketBtn').addEventListener('click', () => { showPage('market'); loadProducts(); });
+        document.getElementById('sellBtn').addEventListener('click', () => {
+            showPage('live');
+            if(currentUser) {
+                document.getElementById('authRequired').classList.add('hidden');
+                document.getElementById('liveStudio').classList.remove('hidden');
             } else {
-                loadSellerDashboard();
+                document.getElementById('authRequired').classList.remove('hidden');
+                document.getElementById('liveStudio').classList.add('hidden');
             }
         });
-        document.getElementById('showLoginTab').addEventListener('click', () => {
-            document.getElementById('loginForm').style.display = 'block';
-            document.getElementById('registerForm').classList.add('hidden');
-        });
-        document.getElementById('showRegisterTab').addEventListener('click', () => {
-            document.getElementById('loginForm').style.display = 'none';
-            document.getElementById('registerForm').classList.remove('hidden');
-        });
-        document.getElementById('doLoginBtn').addEventListener('click', () => {
-            const email = document.getElementById('loginEmail').value;
-            const pwd = document.getElementById('loginPassword').value;
-            const seller = sellers.find(s => s.email === email && s.password === pwd);
-            if(seller) {
-                currentSellerId = seller.id;
-                loadSellerDashboard();
-                showToast(`Welcome back ${seller.storeName}!`);
-            } else alert("Invalid credentials");
-        });
-        document.getElementById('doRegisterBtn').addEventListener('click', () => {
-            const store = document.getElementById('regStoreName').value.trim();
-            const name = document.getElementById('regSellerName').value.trim();
-            const email = document.getElementById('regEmail').value.trim();
-            const mobile = document.getElementById('regMobile').value.trim();
-            const pwd = document.getElementById('regPassword').value;
-            if(!store || !name || !email || !mobile || !pwd) { alert("All fields required"); return; }
-            if(registerSeller(store, name, email, mobile, pwd)) {
-                document.getElementById('loginEmail').value = email;
-                document.getElementById('loginPassword').value = pwd;
-                document.getElementById('showLoginTab').click();
+        document.getElementById('profileBtn').addEventListener('click', () => showPage('profile'));
+        
+        document.querySelector('.mobile-home').addEventListener('click', () => showPage('home'));
+        document.querySelector('.mobile-market').addEventListener('click', () => { showPage('market'); loadProducts(); });
+        document.querySelector('.mobile-live').addEventListener('click', () => {
+            showPage('live');
+            if(currentUser) {
+                document.getElementById('authRequired').classList.add('hidden');
+                document.getElementById('liveStudio').classList.remove('hidden');
             }
         });
-        document.getElementById('logoutSellerBtn').addEventListener('click', logoutSeller);
-        document.getElementById('addProductBtn').addEventListener('click', () => {
-            const name = document.getElementById('prodName').value.trim();
-            const desc = document.getElementById('prodDesc').value.trim();
-            const price = parseFloat(document.getElementById('prodPrice').value);
-            const file = document.getElementById('prodImage').files[0];
-            if(!name || !price || !file) { alert("Name, price & product image required"); return; }
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const newProd = { id: Date.now()+""+Math.random(), sellerId: currentSellerId, name, desc, price, imageData: e.target.result };
-                products.push(newProd);
-                renderSellerProducts();
-                renderMarketplace(document.getElementById('searchProduct')?.value || '');
-                document.getElementById('prodName').value = ''; document.getElementById('prodDesc').value = ''; document.getElementById('prodPrice').value = ''; document.getElementById('prodImage').value = '';
-                showToast('Product added successfully!');
-            };
-            reader.readAsDataURL(file);
-        });
-        document.getElementById('startBroadcastBtn').addEventListener('click', startBroadcast);
-        document.getElementById('stopBroadcastBtn').addEventListener('click', stopBroadcast);
-        document.getElementById('switchCameraBtn').addEventListener('click', switchCamera);
-        document.getElementById('recordVideoBtn').addEventListener('click', startRecording);
-        document.getElementById('stopRecordBtn').addEventListener('click', stopRecording);
-        document.getElementById('searchProduct').addEventListener('input', (e) => renderMarketplace(e.target.value));
-
-        loadData().then(() => {
-            renderMarketplace("");
+        document.querySelector('.mobile-profile').addEventListener('click', () => showPage('profile'));
+        
+        document.getElementById('gotoAuthBtn').addEventListener('click', () => showPage('profile'));
+        document.getElementById('startLiveBtn').addEventListener('click', startLiveStream);
+        document.getElementById('stopLiveBtn').addEventListener('click', stopLiveStream);
+        document.getElementById('switchCamBtn').addEventListener('click', switchCamera);
+        
+        document.getElementById('showLoginModalBtn').addEventListener('click', async () => {
+            const email = prompt('Enter email:');
+            const password = prompt('Enter password:');
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if(error) alert('Login failed: ' + error.message);
+            else {
+                const { data: sellerData } = await supabase.from('sellers').select('*').eq('email', email).single();
+                currentUser = sellerData;
+                document.getElementById('profileLoggedOut').classList.add('hidden');
+                document.getElementById('profileLoggedIn').classList.remove('hidden');
+                document.getElementById('userStoreName').innerText = sellerData.store_name;
+                document.getElementById('userFullName').innerText = sellerData.full_name;
+                document.querySelector('#userMobile span').innerText = sellerData.mobile;
+                loadUserProducts();
+                alert('Login successful!');
+            }
         });
         
-        window.addEventListener('beforeunload', () => {
-            if(activeLiveStream) activeLiveStream.getTracks().forEach(t => t.stop());
+        document.getElementById('showRegisterModalBtn').addEventListener('click', async () => {
+            const email = prompt('Enter email:');
+            const password = prompt('Enter password (min 6 chars):');
+            const storeName = prompt('Store/Business name:');
+            const fullName = prompt('Your full name:');
+            const mobile = prompt('Mobile number:');
+            
+            const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+            if(authError) alert('Registration error: ' + authError.message);
+            else {
+                await supabase.from('sellers').insert({
+                    id: authData.user.id,
+                    email,
+                    store_name: storeName,
+                    full_name: fullName,
+                    mobile
+                });
+                alert('Registration successful! Please login.');
+            }
         });
+        
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await supabase.auth.signOut();
+            currentUser = null;
+            document.getElementById('profileLoggedOut').classList.remove('hidden');
+            document.getElementById('profileLoggedIn').classList.add('hidden');
+            alert('Logged out');
+        });
+        
+        document.getElementById('showAddProductForm').addEventListener('click', async () => {
+            const name = prompt('Product name:');
+            const description = prompt('Description:');
+            const price = parseInt(prompt('Price (KES):'));
+            const imageUrl = prompt('Image URL (or leave empty for default):', 'https://picsum.photos/300/200');
+            
+            if(name && price) {
+                await supabase.from('products').insert({
+                    seller_id: currentUser.id,
+                    name,
+                    description,
+                    price,
+                    image_url: imageUrl
+                });
+                loadUserProducts();
+                loadProducts();
+                alert('Product added!');
+            }
+        });
+        
+        document.getElementById('searchInput')?.addEventListener('input', () => renderProducts());
+        document.querySelector('.exploreBtn')?.addEventListener('click', () => { showPage('market'); loadProducts(); });
+        document.querySelector('.startSellingBtn')?.addEventListener('click', () => {
+            showPage('live');
+            if(currentUser) {
+                document.getElementById('authRequired').classList.add('hidden');
+                document.getElementById('liveStudio').classList.remove('hidden');
+            }
+        });
+        
+        loadProducts();
+        
+        setInterval(async () => {
+            const { data } = await supabase.from('live_sessions').select('*, sellers(store_name, full_name, mobile)').eq('status', 'live').single();
+            if(data && data.sellers) {
+                const liveBanner = document.createElement('div');
+                liveBanner.className = 'fixed top-20 right-4 bg-red-600 text-white p-3 rounded-lg shadow-lg z-50 animate-bounce';
+                liveBanner.innerHTML = `<i class="fas fa-video"></i> ${data.sellers.store_name} is LIVE!`;
+                document.body.appendChild(liveBanner);
+                setTimeout(() => liveBanner.remove(), 5000);
+            }
+        }, 30000);
     </script>
 </body>
 </html>
