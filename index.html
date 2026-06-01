@@ -22,6 +22,7 @@
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: white; padding: 10px 20px; border-radius: 50px; z-index: 2000; font-size: 14px; white-space: nowrap; }
         .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 1100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
         .modal-container { background: white; border-radius: 24px; max-width: 500px; width: 90%; padding: 24px; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -160,317 +161,413 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // ---------- 🔁 REPLACE WITH YOUR SUPABASE CREDENTIALS ----------
-        const SUPABASE_URL = 'https://zdinsgeczlseswpbplhb.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_HxF_sGDkXyrXblGcJGvjZA_kf2AQpnI';
-        // -----------------------------------------------------------------
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const STORAGE_BUCKET = 'product-images';
+        (function() {
+            // ---------- SUPABASE CREDENTIALS (replace with your own) ----------
+            const SUPABASE_URL = 'https://zdinsgeczlseswpbplhb.supabase.co';
+            const SUPABASE_ANON_KEY = 'sb_publishable_HxF_sGDkXyrXblGcJGvjZA_kf2AQpnI';
+            // -----------------------------------------------------------------
 
-        let currentUser = null;
-        let currentRole = null;
-        let products = [];
-        let liveStream = null;
-        let currentCamera = 'user';
-
-        function showToast(msg) {
-            let toast = document.querySelector('.toast');
-            if(toast) toast.remove();
-            toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerText = msg;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        function showPage(page) {
-            document.getElementById('homePage').classList.add('hidden');
-            document.getElementById('marketPage').classList.add('hidden');
-            document.getElementById('livePage').classList.add('hidden');
-            document.getElementById('profilePage').classList.add('hidden');
-            document.getElementById(`${page}Page`).classList.remove('hidden');
-        }
-
-        function updateUIBasedOnRole() {
-            const sellerOnlyElements = document.querySelectorAll('.seller-only');
-            if(currentRole === 'seller') {
-                sellerOnlyElements.forEach(el => el.classList.remove('hidden'));
-            } else {
-                sellerOnlyElements.forEach(el => el.classList.add('hidden'));
-            }
-        }
-
-        async function loadProducts() {
+            let supabase = null;
+            let supabaseReady = false;
             try {
-                const { data, error } = await supabase.from('products').select('*, sellers(full_name, store_name, mobile)');
-                if(error) throw error;
-                products = data || [];
-                renderProducts();
-            } catch(err) { console.error(err); showToast('Error loading products'); }
-        }
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabaseReady = true;
+                console.log("✅ Supabase client initialized");
+            } catch(e) {
+                console.error("❌ Supabase init failed:", e);
+                alert("Supabase configuration error. Check console and credentials.");
+            }
 
-        function renderProducts() {
-            const container = document.getElementById('productsContainer');
-            const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
-            const filtered = products.filter(p => p.name?.toLowerCase().includes(searchTerm) || p.description?.toLowerCase().includes(searchTerm));
-            if(filtered.length === 0) { container.innerHTML = '<div class="col-span-full text-center py-10"><i class="fas fa-box-open text-4xl text-gray-400"></i><p class="text-gray-500">No products found</p></div>'; return; }
-            container.innerHTML = filtered.map(p => `
-                <div class="product-card p-4">
-                    <img src="${p.image_url || 'https://picsum.photos/300/200'}" class="w-full h-48 object-cover rounded-lg mb-3" onerror="this.src='https://picsum.photos/300/200'">
-                    <h3 class="font-bold text-lg">${escapeHtml(p.name)}</h3>
-                    <p class="text-gray-500 text-sm">${escapeHtml(p.description?.substring(0,80) || '')}</p>
-                    <div class="flex justify-between items-center mt-3">
-                        <span class="text-purple-600 font-bold text-xl">KES ${p.price}</span>
-                        <button class="viewSellerBtn text-blue-600 text-sm" data-seller="${p.seller_id}">View Seller</button>
-                    </div>
-                    <div class="mt-2 text-xs text-gray-500"><i class="fas fa-store"></i> ${escapeHtml(p.sellers?.store_name || 'Seller')}</div>
-                </div>
-            `).join('');
-            document.querySelectorAll('.viewSellerBtn').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    const sellerId = btn.dataset.seller;
-                    const { data } = await supabase.from('sellers').select('*').eq('id', sellerId).single();
-                    if(data) alert(`🏪 ${data.store_name}\n👤 ${data.full_name}\n📞 ${data.mobile}\n✉️ ${data.email}`);
+            // App state
+            let currentUser = null;
+            let currentRole = null;
+            let products = [];
+            let liveStream = null;
+            let currentCamera = 'user';
+
+            // Helper: safe get element
+            function $(id) { return document.getElementById(id); }
+
+            // Toast notification
+            function showToast(msg) {
+                let toast = document.querySelector('.toast');
+                if(toast) toast.remove();
+                toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerText = msg;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 3000);
+            }
+
+            // Page navigation
+            function showPage(page) {
+                console.log("Navigating to:", page);
+                const pages = ['homePage', 'marketPage', 'livePage', 'profilePage'];
+                pages.forEach(p => {
+                    const el = $(p);
+                    if(el) el.classList.add('hidden');
                 });
-            });
-        }
-
-        function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
-
-        async function loadUserProducts() {
-            if(!currentUser || currentRole !== 'seller') return;
-            const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id);
-            const container = document.getElementById('myProductsList');
-            if(!data || data.length === 0) { container.innerHTML = '<p class="text-gray-500 text-center">No products yet. Add your first product!</p>'; return; }
-            container.innerHTML = data.map(p => `
-                <div class="flex gap-3 bg-gray-50 p-3 rounded-lg">
-                    <img src="${p.image_url || 'https://picsum.photos/60/60'}" class="w-16 h-16 rounded-lg object-cover">
-                    <div class="flex-1"><p class="font-semibold">${escapeHtml(p.name)}</p><p class="text-sm text-gray-600">KES ${p.price}</p></div>
-                    <button class="deleteProduct text-red-500" data-id="${p.id}"><i class="fas fa-trash"></i></button>
-                </div>
-            `).join('');
-            document.querySelectorAll('.deleteProduct').forEach(btn => {
-                btn.addEventListener('click', async () => {
-                    if(confirm('Delete product?')) {
-                        await supabase.from('products').delete().eq('id', btn.dataset.id);
-                        loadUserProducts(); loadProducts(); showToast('Product deleted');
-                    }
-                });
-            });
-        }
-
-        // Image upload to bucket
-        async function uploadProductImage(file, sellerId) {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${sellerId}_${Date.now()}.${fileExt}`;
-            const filePath = `${fileName}`;
-            const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file);
-            if (uploadError) throw uploadError;
-            const { data: publicUrlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
-            return publicUrlData.publicUrl;
-        }
-
-        // Add product with image upload
-        async function addProductWithImage(name, description, price, imageFile) {
-            if(!currentUser || currentRole !== 'seller') throw new Error('Unauthorized');
-            let imageUrl = 'https://picsum.photos/300/200';
-            if (imageFile) {
-                try {
-                    imageUrl = await uploadProductImage(imageFile, currentUser.id);
-                } catch(e) { console.warn('Upload failed, using default', e); }
+                const target = $(`${page}Page`);
+                if(target) target.classList.remove('hidden');
+                else console.error("Page not found:", page);
             }
-            const { error } = await supabase.from('products').insert({
-                seller_id: currentUser.id,
-                name, description, price: parseInt(price),
-                image_url: imageUrl
-            });
-            if(error) throw error;
-        }
 
-        // Live stream handlers
-        async function startLiveStream() {
-            if(!currentUser || currentRole !== 'seller') { alert('Only sellers can go live'); return; }
-            try {
-                if(liveStream) liveStream.getTracks().forEach(t => t.stop());
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentCamera } }, audio: true });
-                liveStream = stream;
-                document.getElementById('localVideo').srcObject = stream;
-                document.getElementById('startLiveBtn').classList.add('hidden');
-                document.getElementById('stopLiveBtn').classList.remove('hidden');
-                document.getElementById('activeBroadcast').classList.remove('hidden');
-                document.getElementById('liveStatusText').innerHTML = '🔴 LIVE NOW - Broadcasting';
-                await supabase.from('live_sessions').insert({ seller_id: currentUser.id, status: 'live', started_at: new Date() });
-                showToast('You are now LIVE!');
-            } catch(err) { alert('Camera access denied'); }
-        }
-
-        async function stopLiveStream() {
-            if(liveStream) { liveStream.getTracks().forEach(t => t.stop()); liveStream = null; }
-            document.getElementById('localVideo').srcObject = null;
-            document.getElementById('startLiveBtn').classList.remove('hidden');
-            document.getElementById('stopLiveBtn').classList.add('hidden');
-            document.getElementById('activeBroadcast').classList.add('hidden');
-            document.getElementById('liveStatusText').innerHTML = '⚫ Offline';
-            await supabase.from('live_sessions').update({ status: 'ended', ended_at: new Date() }).eq('seller_id', currentUser.id).eq('status', 'live');
-            showToast('Live stream ended');
-        }
-
-        async function switchCamera() {
-            currentCamera = currentCamera === 'user' ? 'environment' : 'user';
-            if(liveStream) { await stopLiveStream(); await startLiveStream(); }
-            else if(document.getElementById('localVideo').srcObject) {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentCamera } }, audio: true });
-                document.getElementById('localVideo').srcObject = stream;
-                if(liveStream) liveStream.getTracks().forEach(t => t.stop());
-                liveStream = stream;
-            }
-            showToast(currentCamera === 'environment' ? 'Back camera active' : 'Front camera active');
-        }
-
-        // Login & Register handlers
-        async function handleRegister() {
-            const role = prompt('Are you a Seller or Buyer? (Enter "seller" or "buyer")');
-            if(!role || (role.toLowerCase() !== 'seller' && role.toLowerCase() !== 'buyer')) { alert('Please choose seller or buyer'); return; }
-            const email = prompt('Enter email:');
-            const password = prompt('Enter password (min 6 chars):');
-            const fullName = prompt('Your full name:');
-            const mobile = prompt('Mobile number:');
-            let storeName = null;
-            if(role.toLowerCase() === 'seller') storeName = prompt('Store/Business name:');
-            if(!email || !password || !fullName || !mobile) { alert('All fields required'); return; }
-            const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
-            if(authError) { alert('Registration error: ' + authError.message); return; }
-            const userId = authData.user.id;
-            if(role.toLowerCase() === 'seller') {
-                await supabase.from('sellers').insert({ id: userId, email, store_name: storeName, full_name: fullName, mobile });
-            } else {
-                await supabase.from('buyers').insert({ id: userId, email, full_name: fullName, mobile });
-            }
-            alert('Registration successful! Please login.');
-        }
-
-        async function handleLogin() {
-            const email = prompt('Enter email:');
-            const password = prompt('Enter password:');
-            if(!email || !password) return;
-            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-            if(error) { alert('Login failed: ' + error.message); return; }
-            let { data: sellerData } = await supabase.from('sellers').select('*').eq('email', email).single();
-            if(sellerData) {
-                currentUser = { id: sellerData.id, email: sellerData.email, role: 'seller', store_name: sellerData.store_name, full_name: sellerData.full_name, mobile: sellerData.mobile };
-            } else {
-                let { data: buyerData } = await supabase.from('buyers').select('*').eq('email', email).single();
-                if(buyerData) {
-                    currentUser = { id: buyerData.id, email: buyerData.email, role: 'buyer', store_name: null, full_name: buyerData.full_name, mobile: buyerData.mobile };
+            // Role-based UI (hide seller buttons for buyers)
+            function updateUIBasedOnRole() {
+                const sellerOnly = document.querySelectorAll('.seller-only');
+                if(currentRole === 'seller') {
+                    sellerOnly.forEach(el => el.classList.remove('hidden'));
                 } else {
-                    alert('User not found in sellers or buyers table');
+                    sellerOnly.forEach(el => el.classList.add('hidden'));
+                }
+            }
+
+            // Load products from Supabase
+            async function loadProducts() {
+                if(!supabaseReady) {
+                    const container = $('#productsContainer');
+                    if(container) container.innerHTML = '<div class="col-span-full text-center py-10 text-red-500">⚠️ Supabase not configured. Cannot load products.</div>';
                     return;
                 }
+                try {
+                    const { data, error } = await supabase.from('products').select('*, sellers(full_name, store_name, mobile)');
+                    if(error) throw error;
+                    products = data || [];
+                    renderProducts();
+                } catch(err) {
+                    console.error(err);
+                    showToast('Error loading products');
+                }
             }
-            currentRole = currentUser.role;
-            document.getElementById('profileLoggedOut').classList.add('hidden');
-            document.getElementById('profileLoggedIn').classList.remove('hidden');
-            document.getElementById('userStoreName').innerText = currentUser.store_name || 'N/A';
-            document.getElementById('userFullName').innerText = currentUser.full_name;
-            document.querySelector('#userMobile span').innerText = currentUser.mobile;
-            document.getElementById('userRole').innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
-            if(currentRole === 'seller') {
-                document.getElementById('sellerPanel').classList.remove('hidden');
-                document.getElementById('buyerPanel').classList.add('hidden');
-                loadUserProducts();
-            } else {
-                document.getElementById('sellerPanel').classList.add('hidden');
-                document.getElementById('buyerPanel').classList.remove('hidden');
-            }
-            updateUIBasedOnRole();
-            alert(`Welcome ${currentUser.full_name}!`);
-        }
 
-        // Event Listeners & DOM Ready
-        document.addEventListener('DOMContentLoaded', () => {
-            // Navigation
-            document.getElementById('homeBtn').addEventListener('click', () => showPage('home'));
-            document.getElementById('marketBtn').addEventListener('click', () => { showPage('market'); loadProducts(); });
-            document.getElementById('sellBtn').addEventListener('click', () => {
-                if(currentRole !== 'seller') { alert('Only sellers can access live studio'); return; }
-                showPage('live');
-                if(currentUser) { document.getElementById('authRequired').classList.add('hidden'); document.getElementById('liveStudio').classList.remove('hidden'); }
-                else { document.getElementById('authRequired').classList.remove('hidden'); document.getElementById('liveStudio').classList.add('hidden'); }
-            });
-            document.getElementById('profileBtn').addEventListener('click', () => showPage('profile'));
-            document.querySelector('.mobile-home').addEventListener('click', () => showPage('home'));
-            document.querySelector('.mobile-market').addEventListener('click', () => { showPage('market'); loadProducts(); });
-            document.querySelector('.mobile-live').addEventListener('click', () => {
-                if(currentRole !== 'seller') { alert('Only sellers can access live studio'); return; }
-                showPage('live');
-                if(currentUser) { document.getElementById('authRequired').classList.add('hidden'); document.getElementById('liveStudio').classList.remove('hidden'); }
-            });
-            document.querySelector('.mobile-profile').addEventListener('click', () => showPage('profile'));
-            document.getElementById('gotoAuthBtn').addEventListener('click', () => showPage('profile'));
-            document.getElementById('startLiveBtn').addEventListener('click', startLiveStream);
-            document.getElementById('stopLiveBtn').addEventListener('click', stopLiveStream);
-            document.getElementById('switchCamBtn').addEventListener('click', switchCamera);
-            document.getElementById('searchInput').addEventListener('input', () => renderProducts());
-            document.querySelector('.exploreBtn').addEventListener('click', () => { showPage('market'); loadProducts(); });
-            document.querySelector('.startSellingBtn').addEventListener('click', () => {
-                if(currentRole !== 'seller') { alert('Please register as a seller to start live selling'); showPage('profile'); return; }
-                showPage('live');
-                if(currentUser) { document.getElementById('authRequired').classList.add('hidden'); document.getElementById('liveStudio').classList.remove('hidden'); }
-            });
-            document.getElementById('showRegisterModalBtn').addEventListener('click', handleRegister);
-            document.getElementById('showLoginModalBtn').addEventListener('click', handleLogin);
-            document.getElementById('logoutBtn').addEventListener('click', async () => {
-                await supabase.auth.signOut();
-                currentUser = null; currentRole = null;
-                document.getElementById('profileLoggedOut').classList.remove('hidden');
-                document.getElementById('profileLoggedIn').classList.add('hidden');
+            function renderProducts() {
+                const container = $('#productsContainer');
+                if(!container) return;
+                const searchInput = $('#searchInput');
+                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+                const filtered = products.filter(p => 
+                    (p.name?.toLowerCase().includes(searchTerm) || p.description?.toLowerCase().includes(searchTerm))
+                );
+                if(filtered.length === 0) {
+                    container.innerHTML = '<div class="col-span-full text-center py-10"><i class="fas fa-box-open text-4xl text-gray-400"></i><p class="text-gray-500">No products found</p></div>';
+                    return;
+                }
+                container.innerHTML = filtered.map(p => `
+                    <div class="product-card p-4">
+                        <img src="${p.image_url || 'https://picsum.photos/300/200'}" class="w-full h-48 object-cover rounded-lg mb-3" onerror="this.src='https://picsum.photos/300/200'">
+                        <h3 class="font-bold text-lg">${escapeHtml(p.name)}</h3>
+                        <p class="text-gray-500 text-sm">${escapeHtml(p.description?.substring(0,80) || '')}</p>
+                        <div class="flex justify-between items-center mt-3">
+                            <span class="text-purple-600 font-bold text-xl">KES ${p.price}</span>
+                            <button class="viewSellerBtn text-blue-600 text-sm" data-seller="${p.seller_id}">View Seller</button>
+                        </div>
+                        <div class="mt-2 text-xs text-gray-500"><i class="fas fa-store"></i> ${escapeHtml(p.sellers?.store_name || 'Seller')}</div>
+                    </div>
+                `).join('');
+
+                // Attach view seller events
+                document.querySelectorAll('.viewSellerBtn').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if(!supabaseReady) return alert("Supabase not ready");
+                        const sellerId = btn.dataset.seller;
+                        const { data } = await supabase.from('sellers').select('*').eq('id', sellerId).single();
+                        if(data) alert(`🏪 ${data.store_name}\n👤 ${data.full_name}\n📞 ${data.mobile}\n✉️ ${data.email}`);
+                    });
+                });
+            }
+
+            function escapeHtml(str) { 
+                if(!str) return ''; 
+                return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); 
+            }
+
+            // Seller product management
+            async function loadUserProducts() {
+                if(!currentUser || currentRole !== 'seller' || !supabaseReady) return;
+                const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id);
+                const container = $('#myProductsList');
+                if(!container) return;
+                if(!data || data.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500 text-center">No products yet. Add your first product!</p>';
+                    return;
+                }
+                container.innerHTML = data.map(p => `
+                    <div class="flex gap-3 bg-gray-50 p-3 rounded-lg">
+                        <img src="${p.image_url || 'https://picsum.photos/60/60'}" class="w-16 h-16 rounded-lg object-cover">
+                        <div class="flex-1"><p class="font-semibold">${escapeHtml(p.name)}</p><p class="text-sm text-gray-600">KES ${p.price}</p></div>
+                        <button class="deleteProduct text-red-500" data-id="${p.id}"><i class="fas fa-trash"></i></button>
+                    </div>
+                `).join('');
+                document.querySelectorAll('.deleteProduct').forEach(btn => {
+                    btn.addEventListener('click', async () => {
+                        if(confirm('Delete product?')) {
+                            await supabase.from('products').delete().eq('id', btn.dataset.id);
+                            loadUserProducts(); loadProducts(); showToast('Product deleted');
+                        }
+                    });
+                });
+            }
+
+            // Image upload helpers
+            const STORAGE_BUCKET = 'product-images';
+            async function uploadProductImage(file, sellerId) {
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${sellerId}_${Date.now()}.${fileExt}`;
+                const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(fileName, file);
+                if (uploadError) throw uploadError;
+                const { data: publicUrlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
+                return publicUrlData.publicUrl;
+            }
+
+            async function addProductWithImage(name, description, price, imageFile) {
+                if(!currentUser || currentRole !== 'seller') throw new Error('Unauthorized');
+                let imageUrl = 'https://picsum.photos/300/200';
+                if (imageFile) {
+                    try {
+                        imageUrl = await uploadProductImage(imageFile, currentUser.id);
+                    } catch(e) { console.warn('Upload failed, using default', e); showToast('Image upload failed, using default image'); }
+                }
+                const { error } = await supabase.from('products').insert({
+                    seller_id: currentUser.id,
+                    name, description, price: parseInt(price),
+                    image_url: imageUrl
+                });
+                if(error) throw error;
+            }
+
+            // Live stream handlers (simplified with error handling)
+            async function startLiveStream() {
+                if(!currentUser || currentRole !== 'seller') { alert('Only sellers can go live'); return; }
+                try {
+                    if(liveStream) liveStream.getTracks().forEach(t => t.stop());
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentCamera } }, audio: true });
+                    liveStream = stream;
+                    const localVideo = $('#localVideo');
+                    if(localVideo) localVideo.srcObject = stream;
+                    $('#startLiveBtn')?.classList.add('hidden');
+                    $('#stopLiveBtn')?.classList.remove('hidden');
+                    $('#activeBroadcast')?.classList.remove('hidden');
+                    const liveStatusText = $('#liveStatusText');
+                    if(liveStatusText) liveStatusText.innerHTML = '🔴 LIVE NOW - Broadcasting';
+                    if(supabaseReady) {
+                        await supabase.from('live_sessions').insert({ seller_id: currentUser.id, status: 'live', started_at: new Date() });
+                    }
+                    showToast('You are now LIVE!');
+                } catch(err) { alert('Camera access denied or error: ' + err.message); }
+            }
+
+            async function stopLiveStream() {
+                if(liveStream) { liveStream.getTracks().forEach(t => t.stop()); liveStream = null; }
+                const localVideo = $('#localVideo');
+                if(localVideo) localVideo.srcObject = null;
+                $('#startLiveBtn')?.classList.remove('hidden');
+                $('#stopLiveBtn')?.classList.add('hidden');
+                $('#activeBroadcast')?.classList.add('hidden');
+                const liveStatusText = $('#liveStatusText');
+                if(liveStatusText) liveStatusText.innerHTML = '⚫ Offline';
+                if(supabaseReady && currentUser) {
+                    await supabase.from('live_sessions').update({ status: 'ended', ended_at: new Date() }).eq('seller_id', currentUser.id).eq('status', 'live');
+                }
+                showToast('Live stream ended');
+            }
+
+            async function switchCamera() {
+                currentCamera = currentCamera === 'user' ? 'environment' : 'user';
+                if(liveStream) {
+                    await stopLiveStream();
+                    await startLiveStream();
+                } else if($('#localVideo')?.srcObject) {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentCamera } }, audio: true });
+                    $('#localVideo').srcObject = stream;
+                    if(liveStream) liveStream.getTracks().forEach(t => t.stop());
+                    liveStream = stream;
+                }
+                showToast(currentCamera === 'environment' ? 'Back camera active' : 'Front camera active');
+            }
+
+            // Auth handlers
+            async function handleRegister() {
+                if(!supabaseReady) { alert("Supabase not configured. Please check credentials."); return; }
+                const role = prompt('Are you a Seller or Buyer? (Enter "seller" or "buyer")');
+                if(!role || (role.toLowerCase() !== 'seller' && role.toLowerCase() !== 'buyer')) { alert('Please choose seller or buyer'); return; }
+                const email = prompt('Enter email:');
+                const password = prompt('Enter password (min 6 chars):');
+                const fullName = prompt('Your full name:');
+                const mobile = prompt('Mobile number:');
+                let storeName = null;
+                if(role.toLowerCase() === 'seller') storeName = prompt('Store/Business name:');
+                if(!email || !password || !fullName || !mobile) { alert('All fields required'); return; }
+                const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+                if(authError) { alert('Registration error: ' + authError.message); return; }
+                const userId = authData.user.id;
+                if(role.toLowerCase() === 'seller') {
+                    await supabase.from('sellers').insert({ id: userId, email, store_name: storeName, full_name: fullName, mobile });
+                } else {
+                    await supabase.from('buyers').insert({ id: userId, email, full_name: fullName, mobile });
+                }
+                alert('Registration successful! Please login.');
+            }
+
+            async function handleLogin() {
+                if(!supabaseReady) { alert("Supabase not configured. Please check credentials."); return; }
+                const email = prompt('Enter email:');
+                const password = prompt('Enter password:');
+                if(!email || !password) return;
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if(error) { alert('Login failed: ' + error.message); return; }
+                let { data: sellerData } = await supabase.from('sellers').select('*').eq('email', email).single();
+                if(sellerData) {
+                    currentUser = { id: sellerData.id, email: sellerData.email, role: 'seller', store_name: sellerData.store_name, full_name: sellerData.full_name, mobile: sellerData.mobile };
+                } else {
+                    let { data: buyerData } = await supabase.from('buyers').select('*').eq('email', email).single();
+                    if(buyerData) {
+                        currentUser = { id: buyerData.id, email: buyerData.email, role: 'buyer', store_name: null, full_name: buyerData.full_name, mobile: buyerData.mobile };
+                    } else {
+                        alert('User not found in sellers or buyers table');
+                        return;
+                    }
+                }
+                currentRole = currentUser.role;
+                $('#profileLoggedOut')?.classList.add('hidden');
+                $('#profileLoggedIn')?.classList.remove('hidden');
+                const userStoreName = $('#userStoreName');
+                if(userStoreName) userStoreName.innerText = currentUser.store_name || 'N/A';
+                const userFullName = $('#userFullName');
+                if(userFullName) userFullName.innerText = currentUser.full_name;
+                const userMobileSpan = document.querySelector('#userMobile span');
+                if(userMobileSpan) userMobileSpan.innerText = currentUser.mobile;
+                const userRoleSpan = $('#userRole');
+                if(userRoleSpan) userRoleSpan.innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
+                if(currentRole === 'seller') {
+                    $('#sellerPanel')?.classList.remove('hidden');
+                    $('#buyerPanel')?.classList.add('hidden');
+                    loadUserProducts();
+                } else {
+                    $('#sellerPanel')?.classList.add('hidden');
+                    $('#buyerPanel')?.classList.remove('hidden');
+                }
+                updateUIBasedOnRole();
+                alert(`Welcome ${currentUser.full_name}!`);
+            }
+
+            async function handleLogout() {
+                if(supabaseReady) await supabase.auth.signOut();
+                currentUser = null;
+                currentRole = null;
+                $('#profileLoggedOut')?.classList.remove('hidden');
+                $('#profileLoggedIn')?.classList.add('hidden');
                 updateUIBasedOnRole();
                 alert('Logged out');
-            });
+            }
 
-            // Add product modal logic
-            const modal = document.getElementById('productModal');
-            const showBtn = document.getElementById('showAddProductForm');
-            const closeBtn = document.getElementById('modalCloseBtn');
-            const submitBtn = document.getElementById('modalSubmitBtn');
+            // ---------- Attach Event Listeners with null checks ----------
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log("DOM ready, attaching events");
 
-            showBtn?.addEventListener('click', () => {
-                if(!currentUser || currentRole !== 'seller') { alert('Only sellers can add products'); return; }
-                modal.classList.remove('hidden');
-                document.getElementById('prodName').value = '';
-                document.getElementById('prodDesc').value = '';
-                document.getElementById('prodPrice').value = '';
-                document.getElementById('prodImage').value = '';
-            });
-            closeBtn?.addEventListener('click', () => modal.classList.add('hidden'));
-            submitBtn?.addEventListener('click', async () => {
-                const name = document.getElementById('prodName').value.trim();
-                const desc = document.getElementById('prodDesc').value.trim();
-                const price = document.getElementById('prodPrice').value;
-                const imageFile = document.getElementById('prodImage').files[0];
-                if(!name || !price) { alert('Name and price required'); return; }
-                try {
-                    await addProductWithImage(name, desc, price, imageFile);
-                    modal.classList.add('hidden');
-                    await loadUserProducts();
-                    await loadProducts();
-                    showToast('Product added successfully!');
-                } catch(err) { alert('Error adding product: ' + err.message); }
-            });
+                // Desktop nav
+                $('#homeBtn')?.addEventListener('click', () => showPage('home'));
+                $('#marketBtn')?.addEventListener('click', () => { showPage('market'); loadProducts(); });
+                $('#sellBtn')?.addEventListener('click', () => {
+                    if(currentRole !== 'seller') { alert('Only sellers can access live studio'); return; }
+                    showPage('live');
+                    if(currentUser) {
+                        $('#authRequired')?.classList.add('hidden');
+                        $('#liveStudio')?.classList.remove('hidden');
+                    } else {
+                        $('#authRequired')?.classList.remove('hidden');
+                        $('#liveStudio')?.classList.add('hidden');
+                    }
+                });
+                $('#profileBtn')?.addEventListener('click', () => showPage('profile'));
 
-            loadProducts();
-            // Live session notification polling
-            setInterval(async () => {
-                const { data } = await supabase.from('live_sessions').select('*, sellers(store_name)').eq('status', 'live').limit(1);
-                if(data && data[0] && data[0].sellers && !document.querySelector('.live-notification')) {
-                    const banner = document.createElement('div');
-                    banner.className = 'live-notification fixed top-20 right-4 bg-red-600 text-white p-3 rounded-lg shadow-lg z-50 animate-bounce';
-                    banner.innerHTML = `<i class="fas fa-video"></i> ${data[0].sellers.store_name} is LIVE!`;
-                    document.body.appendChild(banner);
-                    setTimeout(() => banner.remove(), 5000);
+                // Mobile menu
+                document.querySelector('.mobile-home')?.addEventListener('click', () => showPage('home'));
+                document.querySelector('.mobile-market')?.addEventListener('click', () => { showPage('market'); loadProducts(); });
+                document.querySelector('.mobile-live')?.addEventListener('click', () => {
+                    if(currentRole !== 'seller') { alert('Only sellers can access live studio'); return; }
+                    showPage('live');
+                    if(currentUser) {
+                        $('#authRequired')?.classList.add('hidden');
+                        $('#liveStudio')?.classList.remove('hidden');
+                    }
+                });
+                document.querySelector('.mobile-profile')?.addEventListener('click', () => showPage('profile'));
+
+                // Live studio buttons
+                $('#gotoAuthBtn')?.addEventListener('click', () => showPage('profile'));
+                $('#startLiveBtn')?.addEventListener('click', startLiveStream);
+                $('#stopLiveBtn')?.addEventListener('click', stopLiveStream);
+                $('#switchCamBtn')?.addEventListener('click', switchCamera);
+
+                // Search & explore
+                $('#searchInput')?.addEventListener('input', () => renderProducts());
+                document.querySelector('.exploreBtn')?.addEventListener('click', () => { showPage('market'); loadProducts(); });
+                document.querySelector('.startSellingBtn')?.addEventListener('click', () => {
+                    if(currentRole !== 'seller') { alert('Please register as a seller to start live selling'); showPage('profile'); return; }
+                    showPage('live');
+                    if(currentUser) {
+                        $('#authRequired')?.classList.add('hidden');
+                        $('#liveStudio')?.classList.remove('hidden');
+                    }
+                });
+
+                // Auth buttons
+                $('#showRegisterModalBtn')?.addEventListener('click', handleRegister);
+                $('#showLoginModalBtn')?.addEventListener('click', handleLogin);
+                $('#logoutBtn')?.addEventListener('click', handleLogout);
+
+                // Product modal
+                const modal = $('#productModal');
+                const showAddBtn = $('#showAddProductForm');
+                const closeModalBtn = $('#modalCloseBtn');
+                const submitProductBtn = $('#modalSubmitBtn');
+
+                showAddBtn?.addEventListener('click', () => {
+                    if(!currentUser || currentRole !== 'seller') { alert('Only sellers can add products'); return; }
+                    modal?.classList.remove('hidden');
+                    $('#prodName').value = '';
+                    $('#prodDesc').value = '';
+                    $('#prodPrice').value = '';
+                    $('#prodImage').value = '';
+                });
+                closeModalBtn?.addEventListener('click', () => modal?.classList.add('hidden'));
+                submitProductBtn?.addEventListener('click', async () => {
+                    const name = $('#prodName')?.value.trim();
+                    const desc = $('#prodDesc')?.value.trim();
+                    const price = $('#prodPrice')?.value;
+                    const imageFile = $('#prodImage')?.files[0];
+                    if(!name || !price) { alert('Name and price required'); return; }
+                    try {
+                        await addProductWithImage(name, desc, price, imageFile);
+                        modal?.classList.add('hidden');
+                        await loadUserProducts();
+                        await loadProducts();
+                        showToast('Product added successfully!');
+                    } catch(err) { alert('Error adding product: ' + err.message); }
+                });
+
+                // Initial load
+                loadProducts();
+                showPage('home');
+                updateUIBasedOnRole();
+
+                // Poll for live sessions (if supabase ready)
+                if(supabaseReady) {
+                    setInterval(async () => {
+                        try {
+                            const { data } = await supabase.from('live_sessions').select('*, sellers(store_name)').eq('status', 'live').limit(1);
+                            if(data && data[0] && data[0].sellers && !document.querySelector('.live-notification')) {
+                                const banner = document.createElement('div');
+                                banner.className = 'live-notification fixed top-20 right-4 bg-red-600 text-white p-3 rounded-lg shadow-lg z-50 animate-bounce';
+                                banner.innerHTML = `<i class="fas fa-video"></i> ${data[0].sellers.store_name} is LIVE!`;
+                                document.body.appendChild(banner);
+                                setTimeout(() => banner.remove(), 5000);
+                            }
+                        } catch(e) { /* ignore polling errors */ }
+                    }, 30000);
                 }
-            }, 30000);
-        });
+            });
+        })();
     </script>
 </body>
 </html>
