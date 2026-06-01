@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>TheHive - Modern Marketplace</title>
+    <title>TheHive - Modern Marketplace with Live Selling</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -20,6 +20,8 @@
         .video-wrapper { border-radius: 20px; overflow: hidden; background: #000; height: 300px; }
         video { width: 100%; height: 100%; object-fit: cover; }
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: white; padding: 10px 20px; border-radius: 50px; z-index: 2000; font-size: 14px; white-space: nowrap; }
+        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 1100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-container { background: white; border-radius: 24px; max-width: 500px; width: 90%; padding: 24px; }
     </style>
 </head>
 <body>
@@ -130,6 +132,25 @@
         </div>
     </div>
 
+    <!-- Add Product Modal -->
+    <div id="productModal" class="hidden modal-overlay">
+        <div class="modal-container">
+            <h3 class="text-xl font-bold mb-4">Add New Product</h3>
+            <input type="text" id="prodName" placeholder="Product Name" class="w-full border rounded-lg p-2 mb-3">
+            <textarea id="prodDesc" placeholder="Description" class="w-full border rounded-lg p-2 mb-3"></textarea>
+            <input type="number" id="prodPrice" placeholder="Price (KES)" class="w-full border rounded-lg p-2 mb-3">
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
+                <input type="file" id="prodImage" accept="image/*" class="w-full border rounded-lg p-1">
+                <p class="text-xs text-gray-500 mt-1">Upload image (jpg, png)</p>
+            </div>
+            <div class="flex gap-3 mt-2">
+                <button id="modalSubmitBtn" class="bg-purple-600 text-white px-4 py-2 rounded-full flex-1">Create Product</button>
+                <button id="modalCloseBtn" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-full">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <div class="mobile-menu">
         <button class="mobile-home text-purple-600"><i class="fas fa-home text-2xl"></i></button>
         <button class="mobile-market"><i class="fas fa-store text-2xl text-gray-500"></i></button>
@@ -139,11 +160,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // ---------- 🔁 REPLACE WITH YOUR SUPABASE CREDENTIALS ----------
         const SUPABASE_URL = 'https://zdinsgeczlseswpbplhb.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_HxF_sGDkXyrXblGcJGvjZA_kf2AQpnI';
+        // -----------------------------------------------------------------
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const STORAGE_BUCKET = 'product-images';
 
-        let currentUser = null;      // stores { id, email, role, store_name, full_name, mobile }
+        let currentUser = null;
         let currentRole = null;
         let products = [];
         let liveStream = null;
@@ -167,7 +191,6 @@
             document.getElementById(`${page}Page`).classList.remove('hidden');
         }
 
-        // Update UI based on role (hide seller-only buttons for buyers)
         function updateUIBasedOnRole() {
             const sellerOnlyElements = document.querySelectorAll('.seller-only');
             if(currentRole === 'seller') {
@@ -181,7 +204,8 @@
             try {
                 const { data, error } = await supabase.from('products').select('*, sellers(full_name, store_name, mobile)');
                 if(error) throw error;
-                if(data) { products = data; renderProducts(); }
+                products = data || [];
+                renderProducts();
             } catch(err) { console.error(err); showToast('Error loading products'); }
         }
 
@@ -227,12 +251,43 @@
             `).join('');
             document.querySelectorAll('.deleteProduct').forEach(btn => {
                 btn.addEventListener('click', async () => {
-                    await supabase.from('products').delete().eq('id', btn.dataset.id);
-                    loadUserProducts(); loadProducts(); showToast('Product deleted');
+                    if(confirm('Delete product?')) {
+                        await supabase.from('products').delete().eq('id', btn.dataset.id);
+                        loadUserProducts(); loadProducts(); showToast('Product deleted');
+                    }
                 });
             });
         }
 
+        // Image upload to bucket
+        async function uploadProductImage(file, sellerId) {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${sellerId}_${Date.now()}.${fileExt}`;
+            const filePath = `${fileName}`;
+            const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(filePath, file);
+            if (uploadError) throw uploadError;
+            const { data: publicUrlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(filePath);
+            return publicUrlData.publicUrl;
+        }
+
+        // Add product with image upload
+        async function addProductWithImage(name, description, price, imageFile) {
+            if(!currentUser || currentRole !== 'seller') throw new Error('Unauthorized');
+            let imageUrl = 'https://picsum.photos/300/200';
+            if (imageFile) {
+                try {
+                    imageUrl = await uploadProductImage(imageFile, currentUser.id);
+                } catch(e) { console.warn('Upload failed, using default', e); }
+            }
+            const { error } = await supabase.from('products').insert({
+                seller_id: currentUser.id,
+                name, description, price: parseInt(price),
+                image_url: imageUrl
+            });
+            if(error) throw error;
+        }
+
+        // Live stream handlers
         async function startLiveStream() {
             if(!currentUser || currentRole !== 'seller') { alert('Only sellers can go live'); return; }
             try {
@@ -272,7 +327,66 @@
             showToast(currentCamera === 'environment' ? 'Back camera active' : 'Front camera active');
         }
 
-        // Registration & Login handlers
+        // Login & Register handlers
+        async function handleRegister() {
+            const role = prompt('Are you a Seller or Buyer? (Enter "seller" or "buyer")');
+            if(!role || (role.toLowerCase() !== 'seller' && role.toLowerCase() !== 'buyer')) { alert('Please choose seller or buyer'); return; }
+            const email = prompt('Enter email:');
+            const password = prompt('Enter password (min 6 chars):');
+            const fullName = prompt('Your full name:');
+            const mobile = prompt('Mobile number:');
+            let storeName = null;
+            if(role.toLowerCase() === 'seller') storeName = prompt('Store/Business name:');
+            if(!email || !password || !fullName || !mobile) { alert('All fields required'); return; }
+            const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
+            if(authError) { alert('Registration error: ' + authError.message); return; }
+            const userId = authData.user.id;
+            if(role.toLowerCase() === 'seller') {
+                await supabase.from('sellers').insert({ id: userId, email, store_name: storeName, full_name: fullName, mobile });
+            } else {
+                await supabase.from('buyers').insert({ id: userId, email, full_name: fullName, mobile });
+            }
+            alert('Registration successful! Please login.');
+        }
+
+        async function handleLogin() {
+            const email = prompt('Enter email:');
+            const password = prompt('Enter password:');
+            if(!email || !password) return;
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+            if(error) { alert('Login failed: ' + error.message); return; }
+            let { data: sellerData } = await supabase.from('sellers').select('*').eq('email', email).single();
+            if(sellerData) {
+                currentUser = { id: sellerData.id, email: sellerData.email, role: 'seller', store_name: sellerData.store_name, full_name: sellerData.full_name, mobile: sellerData.mobile };
+            } else {
+                let { data: buyerData } = await supabase.from('buyers').select('*').eq('email', email).single();
+                if(buyerData) {
+                    currentUser = { id: buyerData.id, email: buyerData.email, role: 'buyer', store_name: null, full_name: buyerData.full_name, mobile: buyerData.mobile };
+                } else {
+                    alert('User not found in sellers or buyers table');
+                    return;
+                }
+            }
+            currentRole = currentUser.role;
+            document.getElementById('profileLoggedOut').classList.add('hidden');
+            document.getElementById('profileLoggedIn').classList.remove('hidden');
+            document.getElementById('userStoreName').innerText = currentUser.store_name || 'N/A';
+            document.getElementById('userFullName').innerText = currentUser.full_name;
+            document.querySelector('#userMobile span').innerText = currentUser.mobile;
+            document.getElementById('userRole').innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
+            if(currentRole === 'seller') {
+                document.getElementById('sellerPanel').classList.remove('hidden');
+                document.getElementById('buyerPanel').classList.add('hidden');
+                loadUserProducts();
+            } else {
+                document.getElementById('sellerPanel').classList.add('hidden');
+                document.getElementById('buyerPanel').classList.remove('hidden');
+            }
+            updateUIBasedOnRole();
+            alert(`Welcome ${currentUser.full_name}!`);
+        }
+
+        // Event Listeners & DOM Ready
         document.addEventListener('DOMContentLoaded', () => {
             // Navigation
             document.getElementById('homeBtn').addEventListener('click', () => showPage('home'));
@@ -303,68 +417,8 @@
                 showPage('live');
                 if(currentUser) { document.getElementById('authRequired').classList.add('hidden'); document.getElementById('liveStudio').classList.remove('hidden'); }
             });
-
-            // Registration: ask for role
-            document.getElementById('showRegisterModalBtn').addEventListener('click', async () => {
-                const role = prompt('Are you a Seller or Buyer? (Enter "seller" or "buyer")');
-                if(!role || (role.toLowerCase() !== 'seller' && role.toLowerCase() !== 'buyer')) { alert('Please choose seller or buyer'); return; }
-                const email = prompt('Enter email:');
-                const password = prompt('Enter password (min 6 chars):');
-                const fullName = prompt('Your full name:');
-                const mobile = prompt('Mobile number:');
-                let storeName = null;
-                if(role.toLowerCase() === 'seller') storeName = prompt('Store/Business name:');
-                if(!email || !password || !fullName || !mobile) { alert('All fields required'); return; }
-                const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
-                if(authError) { alert('Registration error: ' + authError.message); return; }
-                const userId = authData.user.id;
-                if(role.toLowerCase() === 'seller') {
-                    await supabase.from('sellers').insert({ id: userId, email, store_name: storeName, full_name: fullName, mobile });
-                } else {
-                    await supabase.from('buyers').insert({ id: userId, email, full_name: fullName, mobile });
-                }
-                alert('Registration successful! Please login.');
-            });
-
-            // Login: check both tables
-            document.getElementById('showLoginModalBtn').addEventListener('click', async () => {
-                const email = prompt('Enter email:');
-                const password = prompt('Enter password:');
-                if(!email || !password) return;
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if(error) { alert('Login failed: ' + error.message); return; }
-                // Check if seller
-                let { data: sellerData } = await supabase.from('sellers').select('*').eq('email', email).single();
-                if(sellerData) {
-                    currentUser = { id: sellerData.id, email: sellerData.email, role: 'seller', store_name: sellerData.store_name, full_name: sellerData.full_name, mobile: sellerData.mobile };
-                } else {
-                    let { data: buyerData } = await supabase.from('buyers').select('*').eq('email', email).single();
-                    if(buyerData) {
-                        currentUser = { id: buyerData.id, email: buyerData.email, role: 'buyer', store_name: null, full_name: buyerData.full_name, mobile: buyerData.mobile };
-                    } else {
-                        alert('User not found in sellers or buyers table');
-                        return;
-                    }
-                }
-                currentRole = currentUser.role;
-                document.getElementById('profileLoggedOut').classList.add('hidden');
-                document.getElementById('profileLoggedIn').classList.remove('hidden');
-                document.getElementById('userStoreName').innerText = currentUser.store_name || 'N/A';
-                document.getElementById('userFullName').innerText = currentUser.full_name;
-                document.querySelector('#userMobile span').innerText = currentUser.mobile;
-                document.getElementById('userRole').innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
-                if(currentRole === 'seller') {
-                    document.getElementById('sellerPanel').classList.remove('hidden');
-                    document.getElementById('buyerPanel').classList.add('hidden');
-                    loadUserProducts();
-                } else {
-                    document.getElementById('sellerPanel').classList.add('hidden');
-                    document.getElementById('buyerPanel').classList.remove('hidden');
-                }
-                updateUIBasedOnRole();
-                alert(`Welcome ${currentUser.full_name}!`);
-            });
-
+            document.getElementById('showRegisterModalBtn').addEventListener('click', handleRegister);
+            document.getElementById('showLoginModalBtn').addEventListener('click', handleLogin);
             document.getElementById('logoutBtn').addEventListener('click', async () => {
                 await supabase.auth.signOut();
                 currentUser = null; currentRole = null;
@@ -374,31 +428,49 @@
                 alert('Logged out');
             });
 
-            document.getElementById('showAddProductForm').addEventListener('click', async () => {
-                if(!currentUser || currentRole !== 'seller') { alert('Only sellers can add products'); return; }
-                const name = prompt('Product name:');
-                const description = prompt('Description:');
-                const price = parseInt(prompt('Price (KES):'));
-                const imageUrl = prompt('Image URL (or leave empty for default):', 'https://picsum.photos/300/200');
-                if(name && price) {
-                    await supabase.from('products').insert({ seller_id: currentUser.id, name, description, price, image_url: imageUrl });
-                    loadUserProducts(); loadProducts(); alert('Product added!');
-                }
-            });
-        });
+            // Add product modal logic
+            const modal = document.getElementById('productModal');
+            const showBtn = document.getElementById('showAddProductForm');
+            const closeBtn = document.getElementById('modalCloseBtn');
+            const submitBtn = document.getElementById('modalSubmitBtn');
 
-        loadProducts();
-        // Check live sessions periodically
-        setInterval(async () => {
-            const { data } = await supabase.from('live_sessions').select('*, sellers(store_name)').eq('status', 'live').single();
-            if(data && data.sellers && !document.querySelector('.live-notification')) {
-                const banner = document.createElement('div');
-                banner.className = 'live-notification fixed top-20 right-4 bg-red-600 text-white p-3 rounded-lg shadow-lg z-50 animate-bounce';
-                banner.innerHTML = `<i class="fas fa-video"></i> ${data.sellers.store_name} is LIVE!`;
-                document.body.appendChild(banner);
-                setTimeout(() => banner.remove(), 5000);
-            }
-        }, 30000);
+            showBtn?.addEventListener('click', () => {
+                if(!currentUser || currentRole !== 'seller') { alert('Only sellers can add products'); return; }
+                modal.classList.remove('hidden');
+                document.getElementById('prodName').value = '';
+                document.getElementById('prodDesc').value = '';
+                document.getElementById('prodPrice').value = '';
+                document.getElementById('prodImage').value = '';
+            });
+            closeBtn?.addEventListener('click', () => modal.classList.add('hidden'));
+            submitBtn?.addEventListener('click', async () => {
+                const name = document.getElementById('prodName').value.trim();
+                const desc = document.getElementById('prodDesc').value.trim();
+                const price = document.getElementById('prodPrice').value;
+                const imageFile = document.getElementById('prodImage').files[0];
+                if(!name || !price) { alert('Name and price required'); return; }
+                try {
+                    await addProductWithImage(name, desc, price, imageFile);
+                    modal.classList.add('hidden');
+                    await loadUserProducts();
+                    await loadProducts();
+                    showToast('Product added successfully!');
+                } catch(err) { alert('Error adding product: ' + err.message); }
+            });
+
+            loadProducts();
+            // Live session notification polling
+            setInterval(async () => {
+                const { data } = await supabase.from('live_sessions').select('*, sellers(store_name)').eq('status', 'live').limit(1);
+                if(data && data[0] && data[0].sellers && !document.querySelector('.live-notification')) {
+                    const banner = document.createElement('div');
+                    banner.className = 'live-notification fixed top-20 right-4 bg-red-600 text-white p-3 rounded-lg shadow-lg z-50 animate-bounce';
+                    banner.innerHTML = `<i class="fas fa-video"></i> ${data[0].sellers.store_name} is LIVE!`;
+                    document.body.appendChild(banner);
+                    setTimeout(() => banner.remove(), 5000);
+                }
+            }, 30000);
+        });
     </script>
 </body>
 </html>
