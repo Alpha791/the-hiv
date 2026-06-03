@@ -13,16 +13,21 @@
         .glass-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
         .product-card { background: white; border-radius: 20px; overflow: hidden; transition: all 0.3s; }
         .product-card:hover { transform: scale(1.02); box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
-        .mobile-menu { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 20px 20px 0 0; z-index: 1000; display: flex; justify-content: space-around; padding: 12px 20px; }
+        .mobile-menu { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 20px 20px 0 0; z-index: 1000; display: flex; justify-content: space-around; padding: 12px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
+        .mobile-menu button { cursor: pointer; background: none; border: none; }
         .desktop-nav { display: flex; gap: 12px; }
         @media (max-width: 768px) { .desktop-nav { display: none; } }
         @media (min-width: 769px) { .mobile-menu { display: none; } }
         .video-wrapper { border-radius: 20px; overflow: hidden; background: #000; height: 300px; }
         video { width: 100%; height: 100%; object-fit: cover; }
-        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: white; padding: 10px 20px; border-radius: 50px; z-index: 2000; font-size: 14px; white-space: nowrap; }
-        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 1100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal-container { background: white; border-radius: 24px; max-width: 500px; width: 90%; padding: 24px; }
+        .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: white; padding: 10px 20px; border-radius: 50px; z-index: 2000; font-size: 14px; }
+        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 1100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-overlay.hidden { display: none; }
+        .modal-container { background: white; border-radius: 24px; max-width: 500px; width: 90%; padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .hidden { display: none; }
+        button { cursor: pointer; transition: all 0.2s ease; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
     </style>
 </head>
 <body>
@@ -53,9 +58,9 @@
                 </div>
             </div>
             <div class="grid md:grid-cols-3 gap-6">
-                <div class="glass-card p-6 text-center"><i class="fas fa-users text-4xl text-purple-600 mb-3"></i><h3 class="text-xl font-bold">500+ Sellers</h3><p class="text-gray-600">Trusted vendors across Kenya</p></div>
-                <div class="glass-card p-6 text-center"><i class="fas fa-video text-4xl text-pink-600 mb-3"></i><h3 class="text-xl font-bold">Live Selling</h3><p class="text-gray-600">Real-time product demos</p></div>
-                <div class="glass-card p-6 text-center"><i class="fas fa-mobile-alt text-4xl text-green-600 mb-3"></i><h3 class="text-xl font-bold">Mobile Ready</h3><p class="text-gray-600">Front & back camera support</p></div>
+                <div class="glass-card p-6 text-center"><i class="fas fa-users text-4xl text-purple-600 mb-3"></i><h3 class="text-xl font-bold">500+ Sellers</h3><p class="text-gray-600">Trusted vendors from across Kenya</p></div>
+                <div class="glass-card p-6 text-center"><i class="fas fa-video text-4xl text-pink-600 mb-3"></i><h3 class="text-xl font-bold">Live Selling</h3><p class="text-gray-600">Real-time product demonstrations</p></div>
+                <div class="glass-card p-6 text-center"><i class="fas fa-mobile-alt text-4xl text-green-600 mb-3"></i><h3 class="text-xl font-bold">Mobile Ready</h3><p class="text-gray-600">Front or back camera showcase</p></div>
             </div>
         </div>
 
@@ -64,7 +69,7 @@
             <div class="glass-card p-6 mb-6">
                 <div class="flex flex-wrap gap-4 justify-between items-center">
                     <h2 class="text-2xl font-bold">Marketplace</h2>
-                    <div class="relative"><i class="fas fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border rounded-full w-64"></div>
+                    <div class="relative"><i class="fas fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"></div>
                 </div>
             </div>
             <div id="productsContainer" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
@@ -92,11 +97,11 @@
                         </div>
                         <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl">
                             <h3 class="font-bold text-lg mb-3">Live Tips</h3>
-                            <ul class="space-y-2 text-sm"><li><i class="fas fa-check-circle text-green-600"></i> Switch to back camera to show product details</li><li><i class="fas fa-check-circle text-green-600"></i> Share your M-Pesa number in chat</li><li><i class="fas fa-check-circle text-green-600"></i> Engage with viewers in real-time</li></ul>
+                            <ul class="space-y-2 text-sm"><li><i class="fas fa-check-circle text-green-600"></i> Switch to back camera to show product details</li><li><i class="fas fa-check-circle text-green-600"></i> Use natural lighting for best results</li><li><i class="fas fa-check-circle text-green-600"></i> Engage with viewers in comments</li></ul>
                             <div id="liveStatus" class="mt-4 p-3 bg-gray-800 text-white rounded-lg text-center"><span id="liveStatusText">⚫ Offline</span></div>
                         </div>
                     </div>
-                    <div id="activeBroadcast" class="mt-6 hidden"><div class="bg-green-100 border border-green-400 p-3 rounded-lg text-center"><i class="fas fa-broadcast-tower text-red-600"></i> You are LIVE! Buyers can see you now</div></div>
+                    <div id="activeBroadcast" class="mt-6 hidden"><div class="bg-green-100 border border-green-400 p-3 rounded-lg text-center"><i class="fas fa-broadcast-tower text-red-600"></i> You are broadcasting live to buyers!</div></div>
                 </div>
             </div>
         </div>
@@ -107,8 +112,10 @@
                 <h2 class="text-2xl font-bold mb-6">Account</h2>
                 <div id="profileLoggedOut" class="text-center p-8">
                     <i class="fas fa-user-circle text-6xl text-gray-400 mb-4"></i>
-                    <button id="showLoginModalBtn" class="bg-purple-600 text-white px-6 py-2 rounded-full"><i class="fas fa-sign-in-alt"></i> Login</button>
-                    <button id="showRegisterModalBtn" class="bg-green-600 text-white px-6 py-2 rounded-full ml-3"><i class="fas fa-user-plus"></i> Register</button>
+                    <div class="space-y-3">
+                        <button id="showLoginModalBtn" class="bg-purple-600 text-white px-6 py-2 rounded-full block mx-auto"><i class="fas fa-sign-in-alt"></i> Login</button>
+                        <button id="showRegisterModalBtn" class="bg-green-600 text-white px-6 py-2 rounded-full block mx-auto"><i class="fas fa-user-plus"></i> Register</button>
+                    </div>
                 </div>
                 <div id="profileLoggedIn" class="hidden">
                     <div class="text-center">
@@ -134,7 +141,7 @@
     </div>
 
     <!-- Add Product Modal -->
-    <div id="productModal" class="hidden modal-overlay">
+    <div id="productModal" class="modal-overlay hidden">
         <div class="modal-container">
             <h3 class="text-xl font-bold mb-4">Add New Product</h3>
             <input type="text" id="prodName" placeholder="Product Name" class="w-full border rounded-lg p-2 mb-3">
@@ -489,6 +496,9 @@
                     if(currentUser) {
                         $('#authRequired')?.classList.add('hidden');
                         $('#liveStudio')?.classList.remove('hidden');
+                    } else {
+                        $('#authRequired')?.classList.remove('hidden');
+                        $('#liveStudio')?.classList.add('hidden');
                     }
                 });
                 document.querySelector('.mobile-profile')?.addEventListener('click', () => showPage('profile'));
@@ -531,6 +541,14 @@
                     $('#prodImage').value = '';
                 });
                 closeModalBtn?.addEventListener('click', () => modal?.classList.add('hidden'));
+                
+                // Close modal when clicking on the overlay
+                modal?.addEventListener('click', (e) => {
+                    if(e.target === modal) {
+                        modal.classList.add('hidden');
+                    }
+                });
+                
                 submitProductBtn?.addEventListener('click', async () => {
                     const name = $('#prodName')?.value.trim();
                     const desc = $('#prodDesc')?.value.trim();
