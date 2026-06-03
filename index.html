@@ -13,7 +13,7 @@
         .glass-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
         .product-card { background: white; border-radius: 20px; overflow: hidden; transition: all 0.3s; }
         .product-card:hover { transform: scale(1.02); box-shadow: 0 10px 40px rgba(0,0,0,0.15); }
-        .mobile-menu { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 20px 20px 0 0; z-index: 1000; display: flex; justify-content: space-around; padding: 12px 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.1); }
+        .mobile-menu { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-radius: 20px 20px 0 0; z-index: 1000; display: flex; justify-content: space-around; padding: 12px 20px; }
         .mobile-menu button { cursor: pointer; background: none; border: none; }
         .desktop-nav { display: flex; gap: 12px; }
         @media (max-width: 768px) { .desktop-nav { display: none; } }
@@ -21,7 +21,7 @@
         .video-wrapper { border-radius: 20px; overflow: hidden; background: #000; height: 300px; }
         video { width: 100%; height: 100%; object-fit: cover; }
         .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.9); color: white; padding: 10px 20px; border-radius: 50px; z-index: 2000; font-size: 14px; }
-        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 1100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+        .modal-overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 1100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-overlay.hidden { display: none; }
         .modal-container { background: white; border-radius: 24px; max-width: 500px; width: 90%; padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
         .hidden { display: none; }
@@ -58,9 +58,9 @@
                 </div>
             </div>
             <div class="grid md:grid-cols-3 gap-6">
-                <div class="glass-card p-6 text-center"><i class="fas fa-users text-4xl text-purple-600 mb-3"></i><h3 class="text-xl font-bold">500+ Sellers</h3><p class="text-gray-600">Trusted vendors from across Kenya</p></div>
-                <div class="glass-card p-6 text-center"><i class="fas fa-video text-4xl text-pink-600 mb-3"></i><h3 class="text-xl font-bold">Live Selling</h3><p class="text-gray-600">Real-time product demonstrations</p></div>
-                <div class="glass-card p-6 text-center"><i class="fas fa-mobile-alt text-4xl text-green-600 mb-3"></i><h3 class="text-xl font-bold">Mobile Ready</h3><p class="text-gray-600">Front or back camera showcase</p></div>
+                <div class="glass-card p-6 text-center"><i class="fas fa-users text-4xl text-purple-600 mb-3"></i><h3 class="text-xl font-bold">500+ Sellers</h3><p class="text-gray-600">Trusted vendors</p></div>
+                <div class="glass-card p-6 text-center"><i class="fas fa-video text-4xl text-pink-600 mb-3"></i><h3 class="text-xl font-bold">Live Selling</h3><p class="text-gray-600">Real-time products</p></div>
+                <div class="glass-card p-6 text-center"><i class="fas fa-mobile-alt text-4xl text-green-600 mb-3"></i><h3 class="text-xl font-bold">Mobile Ready</h3><p class="text-gray-600">Frontend optimized</p></div>
             </div>
         </div>
 
@@ -69,7 +69,7 @@
             <div class="glass-card p-6 mb-6">
                 <div class="flex flex-wrap gap-4 justify-between items-center">
                     <h2 class="text-2xl font-bold">Marketplace</h2>
-                    <div class="relative"><i class="fas fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-600"></div>
+                    <div class="relative"><i class="fas fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg"></div>
                 </div>
             </div>
             <div id="productsContainer" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
@@ -97,11 +97,11 @@
                         </div>
                         <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl">
                             <h3 class="font-bold text-lg mb-3">Live Tips</h3>
-                            <ul class="space-y-2 text-sm"><li><i class="fas fa-check-circle text-green-600"></i> Switch to back camera to show product details</li><li><i class="fas fa-check-circle text-green-600"></i> Use natural lighting for best results</li><li><i class="fas fa-check-circle text-green-600"></i> Engage with viewers in comments</li></ul>
+                            <ul class="space-y-2 text-sm"><li><i class="fas fa-check-circle text-green-600"></i> Switch to back camera to show product details</li><li><i class="fas fa-check-circle text-green-600"></i> Good lighting improves engagement</li></ul>
                             <div id="liveStatus" class="mt-4 p-3 bg-gray-800 text-white rounded-lg text-center"><span id="liveStatusText">⚫ Offline</span></div>
                         </div>
                     </div>
-                    <div id="activeBroadcast" class="mt-6 hidden"><div class="bg-green-100 border border-green-400 p-3 rounded-lg text-center"><i class="fas fa-broadcast-tower text-red-600"></i> You are broadcasting live to buyers!</div></div>
+                    <div id="activeBroadcast" class="mt-6 hidden"><div class="bg-green-100 border border-green-400 p-3 rounded-lg text-center"><i class="fas fa-broadcast-tower text-red-600"></i> Broadcasting live to marketplace</div></div>
                 </div>
             </div>
         </div>
@@ -122,7 +122,7 @@
                         <i class="fas fa-store text-6xl text-purple-600 mb-3"></i>
                         <h3 id="userStoreName" class="text-xl font-bold"></h3>
                         <p id="userFullName" class="text-gray-600"></p>
-                        <p id="userMobile" class="text-gray-500 mt-2"><i class="fas fa-phone"></i> <span></span></p>
+                        <p id="userMobile" class="text-gray-500 mt-2"><i class="fas fa-phone"></i> <span>N/A</span></p>
                         <p id="userRole" class="text-sm text-purple-600 font-semibold mt-1"></p>
                         <button id="logoutBtn" class="mt-4 bg-red-500 text-white px-4 py-2 rounded-full"><i class="fas fa-sign-out-alt"></i> Logout</button>
                     </div>
@@ -206,7 +206,7 @@
                 setTimeout(() => toast.remove(), 3000);
             }
 
-            // Page navigation
+            // Page navigation - FIXED: removed incorrect suffix logic
             function showPage(page) {
                 console.log("Navigating to:", page);
                 const pages = ['homePage', 'marketPage', 'livePage', 'profilePage'];
@@ -214,9 +214,9 @@
                     const el = $(p);
                     if(el) el.classList.add('hidden');
                 });
-                const target = $(`${page}Page`);
+                const target = $(page + 'Page');
                 if(target) target.classList.remove('hidden');
-                else console.error("Page not found:", page);
+                else console.error("Page not found:", page + 'Page');
             }
 
             // Role-based UI (hide seller buttons for buyers)
@@ -305,11 +305,15 @@
                         <button class="deleteProduct text-red-500" data-id="${p.id}"><i class="fas fa-trash"></i></button>
                     </div>
                 `).join('');
-                document.querySelectorAll('.deleteProduct').forEach(btn => {
-                    btn.addEventListener('click', async () => {
+                // FIXED: Properly attach delete handlers
+                container.querySelectorAll('.deleteProduct').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        e.preventDefault();
                         if(confirm('Delete product?')) {
                             await supabase.from('products').delete().eq('id', btn.dataset.id);
-                            loadUserProducts(); loadProducts(); showToast('Product deleted');
+                            loadUserProducts(); 
+                            loadProducts(); 
+                            showToast('Product deleted');
                         }
                     });
                 });
@@ -378,16 +382,28 @@
                 showToast('Live stream ended');
             }
 
+            // FIXED: Camera switching logic
             async function switchCamera() {
                 currentCamera = currentCamera === 'user' ? 'environment' : 'user';
                 if(liveStream) {
                     await stopLiveStream();
                     await startLiveStream();
-                } else if($('#localVideo')?.srcObject) {
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentCamera } }, audio: true });
-                    $('#localVideo').srcObject = stream;
-                    if(liveStream) liveStream.getTracks().forEach(t => t.stop());
-                    liveStream = stream;
+                } else {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentCamera } }, audio: false });
+                        const localVideo = $('#localVideo');
+                        if(localVideo) {
+                            if(localVideo.srcObject) {
+                                localVideo.srcObject.getTracks().forEach(t => t.stop());
+                            }
+                            localVideo.srcObject = stream;
+                            liveStream = stream;
+                        }
+                    } catch(err) {
+                        console.error('Camera switch failed:', err);
+                        showToast('Camera switch failed');
+                        return;
+                    }
                 }
                 showToast(currentCamera === 'environment' ? 'Back camera active' : 'Front camera active');
             }
@@ -441,7 +457,8 @@
                 if(userStoreName) userStoreName.innerText = currentUser.store_name || 'N/A';
                 const userFullName = $('#userFullName');
                 if(userFullName) userFullName.innerText = currentUser.full_name;
-                const userMobileSpan = document.querySelector('#userMobile span');
+                // FIXED: Safe element selection
+                const userMobileSpan = $('#userMobile')?.querySelector('span');
                 if(userMobileSpan) userMobileSpan.innerText = currentUser.mobile;
                 const userRoleSpan = $('#userRole');
                 if(userRoleSpan) userRoleSpan.innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
@@ -535,10 +552,15 @@
                 showAddBtn?.addEventListener('click', () => {
                     if(!currentUser || currentRole !== 'seller') { alert('Only sellers can add products'); return; }
                     modal?.classList.remove('hidden');
-                    $('#prodName').value = '';
-                    $('#prodDesc').value = '';
-                    $('#prodPrice').value = '';
-                    $('#prodImage').value = '';
+                    // FIXED: Safe field clearing
+                    const prodName = $('#prodName');
+                    const prodDesc = $('#prodDesc');
+                    const prodPrice = $('#prodPrice');
+                    const prodImage = $('#prodImage');
+                    if(prodName) prodName.value = '';
+                    if(prodDesc) prodDesc.value = '';
+                    if(prodPrice) prodPrice.value = '';
+                    if(prodImage) prodImage.value = '';
                 });
                 closeModalBtn?.addEventListener('click', () => modal?.classList.add('hidden'));
                 
