@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>TheHive - Modern Marketplace with Live Selling</title>
+    <title>TheHive - Modern Marketplace with Live Selling (Mock Backend)</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3H5f+XN46Z37qvB3D2QhN1eVGP2tPrJ5UY0o8+O1sVZ56Aq7nJPSEUgrI+r+ouNabiCiMgksCQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); font-family: system-ui, -apple-system, sans-serif; }
@@ -58,9 +60,9 @@
                 </div>
             </div>
             <div class="grid md:grid-cols-3 gap-6">
-                <div class="glass-card p-6 text-center"><i class="fas fa-users text-4xl text-purple-600 mb-3"></i><h3 class="text-xl font-bold">500+ Sellers</h3><p class="text-gray-600">Trusted ve[...]</p></div>
-                <div class="glass-card p-6 text-center"><i class="fas fa-video text-4xl text-pink-600 mb-3"></i><h3 class="text-xl font-bold">Live Selling</h3><p class="text-gray-600">Real-time pr[...]</p></div>
-                <div class="glass-card p-6 text-center"><i class="fas fa-mobile-alt text-4xl text-green-600 mb-3"></i><h3 class="text-xl font-bold">Mobile Ready</h3><p class="text-gray-600">Fronte[...]</p></div>
+                <div class="glass-card p-6 text-center"><i class="fas fa-users text-4xl text-purple-600 mb-3"></i><h3 class="text-xl font-bold">500+ Sellers</h3><p class="text-gray-600">Trusted vendors</p></div>
+                <div class="glass-card p-6 text-center"><i class="fas fa-video text-4xl text-pink-600 mb-3"></i><h3 class="text-xl font-bold">Live Selling</h3><p class="text-gray-600">Real-time products</p></div>
+                <div class="glass-card p-6 text-center"><i class="fas fa-mobile-alt text-4xl text-green-600 mb-3"></i><h3 class="text-xl font-bold">Mobile Ready</h3><p class="text-gray-600">Frontend optimized</p></div>
             </div>
         </div>
 
@@ -69,13 +71,13 @@
             <div class="glass-card p-6 mb-6">
                 <div class="flex flex-wrap gap-4 justify-between items-center">
                     <h2 class="text-2xl font-bold">Marketplace</h2>
-                    <div class="relative"><i class="fas fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border rounded-lg"></div>
+                    <div class="relative"><i class="fas fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg"></div>
                 </div>
             </div>
             <div id="productsContainer" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         </div>
 
-        <!-- Live Page (Sellers only) -->
+        <!-- Live Page -->
         <div id="livePage" class="hidden">
             <div class="glass-card p-6">
                 <div class="text-center mb-6"><h2 class="text-2xl font-bold">Live Video Studio</h2><p class="text-gray-600">Connect with buyers in real-time</p></div>
@@ -97,11 +99,11 @@
                         </div>
                         <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl">
                             <h3 class="font-bold text-lg mb-3">Live Tips</h3>
-                            <ul class="space-y-2 text-sm"><li><i class="fas fa-check-circle text-green-600"></i> Switch to back camera to show product details</li><li><i class="fas fa-check-circle text-green-600"></i> Keep good lighting for best results</li></ul>
+                            <ul class="space-y-2 text-sm"><li><i class="fas fa-check-circle text-green-600"></i> Switch to back camera to show product details</li><li><i class="fas fa-check-circle text-green-600"></i> Good lighting improves engagement</li></ul>
                             <div id="liveStatus" class="mt-4 p-3 bg-gray-800 text-white rounded-lg text-center"><span id="liveStatusText">⚫ Offline</span></div>
                         </div>
                     </div>
-                    <div id="activeBroadcast" class="mt-6 hidden"><div class="bg-green-100 border border-green-400 p-3 rounded-lg text-center"><i class="fas fa-broadcast-tower text-red-600"></i> LIVE BROADCAST ACTIVE</div></div>
+                    <div id="activeBroadcast" class="mt-6 hidden"><div class="bg-green-100 border border-green-400 p-3 rounded-lg text-center"><i class="fas fa-broadcast-tower text-red-600"></i> Broadcasting live to marketplace</div></div>
                 </div>
             </div>
         </div>
@@ -150,7 +152,7 @@
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
                 <input type="file" id="prodImage" accept="image/*" class="w-full border rounded-lg p-1">
-                <p class="text-xs text-gray-500 mt-1">Upload image (jpg, png)</p>
+                <p class="text-xs text-gray-500 mt-1">Upload image (jpg, png) – stored locally</p>
             </div>
             <div class="flex gap-3 mt-2">
                 <button id="modalSubmitBtn" class="bg-purple-600 text-white px-4 py-2 rounded-full flex-1">Create Product</button>
@@ -166,56 +168,41 @@
         <button class="mobile-profile"><i class="fas fa-user text-2xl text-gray-500"></i></button>
     </div>
 
-    <script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         (function() {
-            // ---------- SUPABASE CREDENTIALS (replace with your own) ----------
-            const SUPABASE_URL = 'https://zdinsgeczlseswpbplhb.supabase.co';
-            const SUPABASE_ANON_KEY = 'sb_publishable_HxF_sGDkXyrXblGcJGvjZA_kf2AQpnI';
-            // -----------------------------------------------------------------
-
-            let supabase = null;
-            let supabaseReady = false;
-            
-            // Wait for Supabase to load
-            function waitForSupabase() {
-                return new Promise((resolve) => {
-                    if (window.supabase) {
-                        resolve();
-                    } else {
-                        const interval = setInterval(() => {
-                            if (window.supabase) {
-                                clearInterval(interval);
-                                resolve();
-                            }
-                        }, 100);
-                    }
-                });
+            // ---------- MOCK BACKEND (localStorage) ----------
+            // Initialize data structures if empty
+            if (!localStorage.getItem('mock_sellers')) {
+                localStorage.setItem('mock_sellers', JSON.stringify([]));
             }
-
-            // Initialize Supabase
-            async function initSupabase() {
-                try {
-                    await waitForSupabase();
-                    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                    supabaseReady = true;
-                    console.log("✅ Supabase client initialized");
-                } catch(e) {
-                    console.error("❌ Supabase init failed:", e);
-                }
+            if (!localStorage.getItem('mock_buyers')) {
+                localStorage.setItem('mock_buyers', JSON.stringify([]));
             }
+            if (!localStorage.getItem('mock_products')) {
+                localStorage.setItem('mock_products', JSON.stringify([]));
+            }
+            if (!localStorage.getItem('mock_current_user')) {
+                localStorage.setItem('mock_current_user', 'null');
+            }
+            // Helper functions
+            function getSellers() { return JSON.parse(localStorage.getItem('mock_sellers')); }
+            function saveSellers(sellers) { localStorage.setItem('mock_sellers', JSON.stringify(sellers)); }
+            function getBuyers() { return JSON.parse(localStorage.getItem('mock_buyers')); }
+            function saveBuyers(buyers) { localStorage.setItem('mock_buyers', JSON.stringify(buyers)); }
+            function getProducts() { return JSON.parse(localStorage.getItem('mock_products')); }
+            function saveProducts(products) { localStorage.setItem('mock_products', JSON.stringify(products)); }
+            function getCurrentUser() { return JSON.parse(localStorage.getItem('mock_current_user')); }
+            function setCurrentUser(user) { localStorage.setItem('mock_current_user', JSON.stringify(user)); }
 
             // App state
-            let currentUser = null;
-            let currentRole = null;
-            let products = [];
+            let currentUser = getCurrentUser();
+            let currentRole = currentUser ? currentUser.role : null;
+            let products = getProducts();
             let liveStream = null;
             let currentCamera = 'user';
 
-            // Helper: safe get element
+            // DOM helpers
             function $(id) { return document.getElementById(id); }
-
-            // Toast notification
             function showToast(msg) {
                 let toast = document.querySelector('.toast');
                 if(toast) toast.remove();
@@ -225,10 +212,7 @@
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 3000);
             }
-
-            // Page navigation
             function showPage(page) {
-                console.log("Navigating to:", page);
                 const pages = ['homePage', 'marketPage', 'livePage', 'profilePage'];
                 pages.forEach(p => {
                     const el = $(p);
@@ -238,135 +222,119 @@
                 if(target) target.classList.remove('hidden');
                 else console.error("Page not found:", page + 'Page');
             }
-
-            // Role-based UI (hide seller buttons for buyers)
             function updateUIBasedOnRole() {
                 const sellerOnly = document.querySelectorAll('.seller-only');
-                if(currentRole === 'seller') {
-                    sellerOnly.forEach(el => el.classList.remove('hidden'));
-                } else {
-                    sellerOnly.forEach(el => el.classList.add('hidden'));
-                }
+                if(currentRole === 'seller') sellerOnly.forEach(el => el.classList.remove('hidden'));
+                else sellerOnly.forEach(el => el.classList.add('hidden'));
             }
+            function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
 
-            // Load products from Supabase
-            async function loadProducts() {
-                if(!supabaseReady) {
-                    const container = $('#productsContainer');
-                    if(container) container.innerHTML = '<div class="col-span-full text-center py-10 text-red-500">⚠️ Supabase not configured. Cannot load products.</div>';
-                    return;
-                }
-                try {
-                    const { data, error } = await supabase.from('products').select('*, sellers(full_name, store_name, mobile)');
-                    if(error) throw error;
-                    products = data || [];
-                    renderProducts();
-                } catch(err) {
-                    console.error(err);
-                    showToast('Error loading products');
-                }
-            }
-
+            // Render marketplace products
             function renderProducts() {
                 const container = $('#productsContainer');
                 if(!container) return;
-                const searchInput = $('#searchInput');
-                const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+                const searchTerm = $('#searchInput')?.value.toLowerCase() || '';
                 const filtered = products.filter(p => 
-                    (p.name?.toLowerCase().includes(searchTerm) || p.description?.toLowerCase().includes(searchTerm))
+                    p.name.toLowerCase().includes(searchTerm) || p.description.toLowerCase().includes(searchTerm)
                 );
                 if(filtered.length === 0) {
                     container.innerHTML = '<div class="col-span-full text-center py-10"><i class="fas fa-box-open text-4xl text-gray-400"></i><p class="text-gray-500">No products found</p></div>';
                     return;
                 }
-                container.innerHTML = filtered.map(p => `
-                    <div class="product-card p-4">
-                        <img src="${p.image_url || 'https://picsum.photos/300/200'}" class="w-full h-48 object-cover rounded-lg mb-3" onerror="this.src='https://picsum.photos/300/200'">
-                        <h3 class="font-bold text-lg">${escapeHtml(p.name)}</h3>
-                        <p class="text-gray-500 text-sm">${escapeHtml(p.description?.substring(0,80) || '')}</p>
-                        <div class="flex justify-between items-center mt-3">
-                            <span class="text-purple-600 font-bold text-xl">KES ${p.price}</span>
-                            <button class="viewSellerBtn text-blue-600 text-sm" data-seller="${p.seller_id}">View Seller</button>
+                // Get seller info for each product
+                const sellers = getSellers();
+                container.innerHTML = filtered.map(p => {
+                    const seller = sellers.find(s => s.id === p.sellerId);
+                    return `
+                        <div class="product-card p-4">
+                            <img src="${p.imageUrl || 'https://picsum.photos/300/200'}" class="w-full h-48 object-cover rounded-lg mb-3" onerror="this.src='https://picsum.photos/300/200'">
+                            <h3 class="font-bold text-lg">${escapeHtml(p.name)}</h3>
+                            <p class="text-gray-500 text-sm">${escapeHtml(p.description.substring(0,80))}</p>
+                            <div class="flex justify-between items-center mt-3">
+                                <span class="text-purple-600 font-bold text-xl">KES ${p.price}</span>
+                                <button class="viewSellerBtn text-blue-600 text-sm" data-seller="${p.sellerId}">View Seller</button>
+                            </div>
+                            <div class="mt-2 text-xs text-gray-500"><i class="fas fa-store"></i> ${escapeHtml(seller?.storeName || 'Seller')}</div>
                         </div>
-                        <div class="mt-2 text-xs text-gray-500"><i class="fas fa-store"></i> ${escapeHtml(p.sellers?.store_name || 'Seller')}</div>
-                    </div>
-                `).join('');
-
-                // Attach view seller events
+                    `;
+                }).join('');
                 document.querySelectorAll('.viewSellerBtn').forEach(btn => {
-                    btn.addEventListener('click', async () => {
-                        if(!supabaseReady) return alert("Supabase not ready");
+                    btn.addEventListener('click', () => {
                         const sellerId = btn.dataset.seller;
-                        const { data } = await supabase.from('sellers').select('*').eq('id', sellerId).single();
-                        if(data) alert(`🏪 ${data.store_name}\n👤 ${data.full_name}\n📞 ${data.mobile}\n✉️ ${data.email}`);
+                        const seller = getSellers().find(s => s.id === sellerId);
+                        if(seller) alert(`🏪 ${seller.storeName}\n👤 ${seller.fullName}\n📞 ${seller.mobile}\n✉️ ${seller.email}`);
                     });
                 });
             }
 
-            function escapeHtml(str) { 
-                if(!str) return ''; 
-                return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); 
+            function loadProductsAndRender() {
+                products = getProducts();
+                renderProducts();
             }
 
             // Seller product management
-            async function loadUserProducts() {
-                if(!currentUser || currentRole !== 'seller' || !supabaseReady) return;
-                const { data } = await supabase.from('products').select('*').eq('seller_id', currentUser.id);
+            function loadUserProducts() {
+                if(!currentUser || currentRole !== 'seller') return;
+                const myProducts = products.filter(p => p.sellerId === currentUser.id);
                 const container = $('#myProductsList');
                 if(!container) return;
-                if(!data || data.length === 0) {
+                if(myProducts.length === 0) {
                     container.innerHTML = '<p class="text-gray-500 text-center">No products yet. Add your first product!</p>';
                     return;
                 }
-                container.innerHTML = data.map(p => `
+                container.innerHTML = myProducts.map(p => `
                     <div class="flex gap-3 bg-gray-50 p-3 rounded-lg">
-                        <img src="${p.image_url || 'https://picsum.photos/60/60'}" class="w-16 h-16 rounded-lg object-cover">
+                        <img src="${p.imageUrl || 'https://picsum.photos/60/60'}" class="w-16 h-16 rounded-lg object-cover">
                         <div class="flex-1"><p class="font-semibold">${escapeHtml(p.name)}</p><p class="text-sm text-gray-600">KES ${p.price}</p></div>
                         <button class="deleteProduct text-red-500" data-id="${p.id}"><i class="fas fa-trash"></i></button>
                     </div>
                 `).join('');
-                // Properly attach delete handlers
                 container.querySelectorAll('.deleteProduct').forEach(btn => {
-                    btn.addEventListener('click', async (e) => {
+                    btn.addEventListener('click', (e) => {
                         e.preventDefault();
                         if(confirm('Delete product?')) {
-                            await supabase.from('products').delete().eq('id', btn.dataset.id);
-                            loadUserProducts(); 
-                            loadProducts(); 
+                            const newProducts = products.filter(p => p.id != btn.dataset.id);
+                            saveProducts(newProducts);
+                            products = newProducts;
+                            loadUserProducts();
+                            loadProductsAndRender();
                             showToast('Product deleted');
                         }
                     });
                 });
             }
 
-            // Image upload helpers
-            const STORAGE_BUCKET = 'product-images';
-            async function uploadProductImage(file, sellerId) {
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${sellerId}_${Date.now()}.${fileExt}`;
-                const { error: uploadError } = await supabase.storage.from(STORAGE_BUCKET).upload(fileName, file);
-                if (uploadError) throw uploadError;
-                const { data: publicUrlData } = supabase.storage.from(STORAGE_BUCKET).getPublicUrl(fileName);
-                return publicUrlData.publicUrl;
-            }
-
-            async function addProductWithImage(name, description, price, imageFile) {
-                if(!currentUser || currentRole !== 'seller') throw new Error('Unauthorized');
-                let imageUrl = 'https://picsum.photos/300/200';
-                if (imageFile) {
-                    try {
-                        imageUrl = await uploadProductImage(imageFile, currentUser.id);
-                    } catch(e) { console.warn('Upload failed, using default', e); showToast('Image upload failed, using default image'); }
-                }
-                const { error } = await supabase.from('products').insert({
-                    seller_id: currentUser.id,
-                    name, description, price: parseInt(price),
-                    image_url: imageUrl
+            function addProduct(name, description, price, imageFile) {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const imageUrl = e.target.result; // base64
+                        const newProduct = {
+                            id: Date.now().toString(),
+                            sellerId: currentUser.id,
+                            name: name,
+                            description: description,
+                            price: parseInt(price),
+                            imageUrl: imageUrl
+                        };
+                        const updated = [...products, newProduct];
+                        saveProducts(updated);
+                        products = updated;
+                        resolve();
+                    };
+                    reader.onerror = reject;
+                    if (imageFile) reader.readAsDataURL(imageFile);
+                    else {
+                        newProduct.imageUrl = 'https://picsum.photos/300/200';
+                        const updated = [...products, newProduct];
+                        saveProducts(updated);
+                        products = updated;
+                        resolve();
+                    }
                 });
-                if(error) throw error;
             }
 
-            // Live stream handlers (simplified with error handling)
+            // Live stream handlers
             async function startLiveStream() {
                 if(!currentUser || currentRole !== 'seller') { alert('Only sellers can go live'); return; }
                 try {
@@ -380,13 +348,9 @@
                     $('#activeBroadcast')?.classList.remove('hidden');
                     const liveStatusText = $('#liveStatusText');
                     if(liveStatusText) liveStatusText.innerHTML = '🔴 LIVE NOW - Broadcasting';
-                    if(supabaseReady) {
-                        await supabase.from('live_sessions').insert({ seller_id: currentUser.id, status: 'live', started_at: new Date() });
-                    }
                     showToast('You are now LIVE!');
-                } catch(err) { alert('Camera access denied or error: ' + err.message); }
+                } catch(err) { alert('Camera access denied: ' + err.message); }
             }
-
             async function stopLiveStream() {
                 if(liveStream) { liveStream.getTracks().forEach(t => t.stop()); liveStream = null; }
                 const localVideo = $('#localVideo');
@@ -396,13 +360,8 @@
                 $('#activeBroadcast')?.classList.add('hidden');
                 const liveStatusText = $('#liveStatusText');
                 if(liveStatusText) liveStatusText.innerHTML = '⚫ Offline';
-                if(supabaseReady && currentUser) {
-                    await supabase.from('live_sessions').update({ status: 'ended', ended_at: new Date() }).eq('seller_id', currentUser.id).eq('status', 'live');
-                }
                 showToast('Live stream ended');
             }
-
-            // Camera switching logic
             async function switchCamera() {
                 currentCamera = currentCamera === 'user' ? 'environment' : 'user';
                 if(liveStream) {
@@ -413,74 +372,78 @@
                         const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentCamera } }, audio: false });
                         const localVideo = $('#localVideo');
                         if(localVideo) {
-                            if(localVideo.srcObject) {
-                                localVideo.srcObject.getTracks().forEach(t => t.stop());
-                            }
+                            if(localVideo.srcObject) localVideo.srcObject.getTracks().forEach(t => t.stop());
                             localVideo.srcObject = stream;
                             liveStream = stream;
                         }
-                    } catch(err) {
-                        console.error('Camera switch failed:', err);
-                        showToast('Camera switch failed');
-                        return;
-                    }
+                    } catch(err) { showToast('Camera switch failed'); }
                 }
                 showToast(currentCamera === 'environment' ? 'Back camera active' : 'Front camera active');
             }
 
-            // Auth handlers
-            async function handleRegister() {
-                if(!supabaseReady) { alert("Supabase not configured. Please check credentials."); return; }
+            // Auth functions (mock)
+            function handleRegister() {
                 const role = prompt('Are you a Seller or Buyer? (Enter "seller" or "buyer")');
-                if(!role || (role.toLowerCase() !== 'seller' && role.toLowerCase() !== 'buyer')) { alert('Please choose seller or buyer'); return; }
+                if(!role || (role !== 'seller' && role !== 'buyer')) { alert('Please choose seller or buyer'); return; }
                 const email = prompt('Enter email:');
                 const password = prompt('Enter password (min 6 chars):');
                 const fullName = prompt('Your full name:');
                 const mobile = prompt('Mobile number:');
                 let storeName = null;
-                if(role.toLowerCase() === 'seller') storeName = prompt('Store/Business name:');
+                if(role === 'seller') storeName = prompt('Store/Business name:');
                 if(!email || !password || !fullName || !mobile) { alert('All fields required'); return; }
-                const { data: authData, error: authError } = await supabase.auth.signUp({ email, password });
-                if(authError) { alert('Registration error: ' + authError.message); return; }
-                const userId = authData.user.id;
-                if(role.toLowerCase() === 'seller') {
-                    await supabase.from('sellers').insert({ id: userId, email, store_name: storeName, full_name: fullName, mobile });
-                } else {
-                    await supabase.from('buyers').insert({ id: userId, email, full_name: fullName, mobile });
+                // Check if email exists
+                const sellers = getSellers();
+                const buyers = getBuyers();
+                if(sellers.find(s => s.email === email) || buyers.find(b => b.email === email)) {
+                    alert('Email already registered');
+                    return;
                 }
-                alert('Registration successful! Please login.');
+                const id = Date.now().toString();
+                if(role === 'seller') {
+                    const newSeller = { id, email, password, fullName, mobile, storeName, role: 'seller' };
+                    sellers.push(newSeller);
+                    saveSellers(sellers);
+                    alert('Registration successful! Please login.');
+                } else {
+                    const newBuyer = { id, email, password, fullName, mobile, role: 'buyer' };
+                    buyers.push(newBuyer);
+                    saveBuyers(buyers);
+                    alert('Registration successful! Please login.');
+                }
             }
 
-            async function handleLogin() {
-                if(!supabaseReady) { alert("Supabase not configured. Please check credentials."); return; }
+            function handleLogin() {
                 const email = prompt('Enter email:');
                 const password = prompt('Enter password:');
                 if(!email || !password) return;
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if(error) { alert('Login failed: ' + error.message); return; }
-                let { data: sellerData } = await supabase.from('sellers').select('*').eq('email', email).single();
-                if(sellerData) {
-                    currentUser = { id: sellerData.id, email: sellerData.email, role: 'seller', store_name: sellerData.store_name, full_name: sellerData.full_name, mobile: sellerData.mobile };
-                } else {
-                    let { data: buyerData } = await supabase.from('buyers').select('*').eq('email', email).single();
-                    if(buyerData) {
-                        currentUser = { id: buyerData.id, email: buyerData.email, role: 'buyer', store_name: null, full_name: buyerData.full_name, mobile: buyerData.mobile };
-                    } else {
-                        alert('User not found in sellers or buyers table');
-                        return;
-                    }
+                const sellers = getSellers();
+                const buyers = getBuyers();
+                let user = sellers.find(u => u.email === email && u.password === password);
+                let role = 'seller';
+                if(!user) {
+                    user = buyers.find(u => u.email === email && u.password === password);
+                    role = 'buyer';
                 }
+                if(!user) { alert('Invalid email or password'); return; }
+                currentUser = {
+                    id: user.id,
+                    email: user.email,
+                    role: role,
+                    store_name: user.storeName || null,
+                    full_name: user.fullName,
+                    mobile: user.mobile
+                };
                 currentRole = currentUser.role;
+                setCurrentUser(currentUser);
+                // Update UI
                 $('#profileLoggedOut')?.classList.add('hidden');
                 $('#profileLoggedIn')?.classList.remove('hidden');
-                const userStoreName = $('#userStoreName');
-                if(userStoreName) userStoreName.innerText = currentUser.store_name || 'N/A';
-                const userFullName = $('#userFullName');
-                if(userFullName) userFullName.innerText = currentUser.full_name;
+                $('#userStoreName').innerText = currentUser.store_name || 'N/A';
+                $('#userFullName').innerText = currentUser.full_name;
                 const userMobileSpan = $('#userMobile')?.querySelector('span');
                 if(userMobileSpan) userMobileSpan.innerText = currentUser.mobile;
-                const userRoleSpan = $('#userRole');
-                if(userRoleSpan) userRoleSpan.innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
+                $('#userRole').innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
                 if(currentRole === 'seller') {
                     $('#sellerPanel')?.classList.remove('hidden');
                     $('#buyerPanel')?.classList.add('hidden');
@@ -491,28 +454,24 @@
                 }
                 updateUIBasedOnRole();
                 alert(`Welcome ${currentUser.full_name}!`);
+                showPage('home');
             }
 
-            async function handleLogout() {
-                if(supabaseReady) await supabase.auth.signOut();
+            function handleLogout() {
                 currentUser = null;
                 currentRole = null;
+                setCurrentUser(null);
                 $('#profileLoggedOut')?.classList.remove('hidden');
                 $('#profileLoggedIn')?.classList.add('hidden');
                 updateUIBasedOnRole();
                 alert('Logged out');
+                showPage('home');
             }
 
-            // ---------- Attach Event Listeners with null checks ----------
-            document.addEventListener('DOMContentLoaded', async () => {
-                console.log("DOM ready, initializing app");
-                
-                // Initialize Supabase
-                await initSupabase();
-
-                // Desktop nav
+            // Event listeners
+            document.addEventListener('DOMContentLoaded', () => {
                 $('#homeBtn')?.addEventListener('click', () => showPage('home'));
-                $('#marketBtn')?.addEventListener('click', () => { showPage('market'); loadProducts(); });
+                $('#marketBtn')?.addEventListener('click', () => { showPage('market'); loadProductsAndRender(); });
                 $('#sellBtn')?.addEventListener('click', () => {
                     if(currentRole !== 'seller') { alert('Only sellers can access live studio'); return; }
                     showPage('live');
@@ -526,9 +485,8 @@
                 });
                 $('#profileBtn')?.addEventListener('click', () => showPage('profile'));
 
-                // Mobile menu
                 document.querySelector('.mobile-home')?.addEventListener('click', () => showPage('home'));
-                document.querySelector('.mobile-market')?.addEventListener('click', () => { showPage('market'); loadProducts(); });
+                document.querySelector('.mobile-market')?.addEventListener('click', () => { showPage('market'); loadProductsAndRender(); });
                 document.querySelector('.mobile-live')?.addEventListener('click', () => {
                     if(currentRole !== 'seller') { alert('Only sellers can access live studio'); return; }
                     showPage('live');
@@ -542,15 +500,12 @@
                 });
                 document.querySelector('.mobile-profile')?.addEventListener('click', () => showPage('profile'));
 
-                // Live studio buttons
                 $('#gotoAuthBtn')?.addEventListener('click', () => showPage('profile'));
                 $('#startLiveBtn')?.addEventListener('click', startLiveStream);
                 $('#stopLiveBtn')?.addEventListener('click', stopLiveStream);
                 $('#switchCamBtn')?.addEventListener('click', switchCamera);
-
-                // Search & explore
                 $('#searchInput')?.addEventListener('input', () => renderProducts());
-                document.querySelector('.exploreBtn')?.addEventListener('click', () => { showPage('market'); loadProducts(); });
+                document.querySelector('.exploreBtn')?.addEventListener('click', () => { showPage('market'); loadProductsAndRender(); });
                 document.querySelector('.startSellingBtn')?.addEventListener('click', () => {
                     if(currentRole !== 'seller') { alert('Please register as a seller to start live selling'); showPage('profile'); return; }
                     showPage('live');
@@ -560,7 +515,6 @@
                     }
                 });
 
-                // Auth buttons
                 $('#showRegisterModalBtn')?.addEventListener('click', handleRegister);
                 $('#showLoginModalBtn')?.addEventListener('click', handleLogin);
                 $('#logoutBtn')?.addEventListener('click', handleLogout);
@@ -574,24 +528,13 @@
                 showAddBtn?.addEventListener('click', () => {
                     if(!currentUser || currentRole !== 'seller') { alert('Only sellers can add products'); return; }
                     modal?.classList.remove('hidden');
-                    const prodName = $('#prodName');
-                    const prodDesc = $('#prodDesc');
-                    const prodPrice = $('#prodPrice');
-                    const prodImage = $('#prodImage');
-                    if(prodName) prodName.value = '';
-                    if(prodDesc) prodDesc.value = '';
-                    if(prodPrice) prodPrice.value = '';
-                    if(prodImage) prodImage.value = '';
+                    $('#prodName').value = '';
+                    $('#prodDesc').value = '';
+                    $('#prodPrice').value = '';
+                    $('#prodImage').value = '';
                 });
                 closeModalBtn?.addEventListener('click', () => modal?.classList.add('hidden'));
-                
-                // Close modal when clicking on the overlay
-                modal?.addEventListener('click', (e) => {
-                    if(e.target === modal) {
-                        modal.classList.add('hidden');
-                    }
-                });
-                
+                modal?.addEventListener('click', (e) => { if(e.target === modal) modal.classList.add('hidden'); });
                 submitProductBtn?.addEventListener('click', async () => {
                     const name = $('#prodName')?.value.trim();
                     const desc = $('#prodDesc')?.value.trim();
@@ -599,33 +542,35 @@
                     const imageFile = $('#prodImage')?.files[0];
                     if(!name || !price) { alert('Name and price required'); return; }
                     try {
-                        await addProductWithImage(name, desc, price, imageFile);
+                        await addProduct(name, desc, price, imageFile);
                         modal?.classList.add('hidden');
-                        await loadUserProducts();
-                        await loadProducts();
+                        loadUserProducts();
+                        loadProductsAndRender();
                         showToast('Product added successfully!');
                     } catch(err) { alert('Error adding product: ' + err.message); }
                 });
 
-                // Initial load
-                loadProducts();
+                // Initial render
+                loadProductsAndRender();
                 showPage('home');
                 updateUIBasedOnRole();
-
-                // Poll for live sessions (if supabase ready)
-                if(supabaseReady) {
-                    setInterval(async () => {
-                        try {
-                            const { data } = await supabase.from('live_sessions').select('*, sellers(store_name)').eq('status', 'live').limit(1);
-                            if(data && data[0] && data[0].sellers && !document.querySelector('.live-notification')) {
-                                const banner = document.createElement('div');
-                                banner.className = 'live-notification fixed top-20 right-4 bg-red-600 text-white p-3 rounded-lg shadow-lg z-50 animate-bounce';
-                                banner.innerHTML = `<i class="fas fa-video"></i> ${data[0].sellers.store_name} is LIVE!`;
-                                document.body.appendChild(banner);
-                                setTimeout(() => banner.remove(), 5000);
-                            }
-                        } catch(e) { /* ignore polling errors */ }
-                    }, 30000);
+                // If already logged in (from localStorage), update profile UI
+                if(currentUser) {
+                    $('#profileLoggedOut')?.classList.add('hidden');
+                    $('#profileLoggedIn')?.classList.remove('hidden');
+                    $('#userStoreName').innerText = currentUser.store_name || 'N/A';
+                    $('#userFullName').innerText = currentUser.full_name;
+                    const userMobileSpan = $('#userMobile')?.querySelector('span');
+                    if(userMobileSpan) userMobileSpan.innerText = currentUser.mobile;
+                    $('#userRole').innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
+                    if(currentRole === 'seller') {
+                        $('#sellerPanel')?.classList.remove('hidden');
+                        $('#buyerPanel')?.classList.add('hidden');
+                        loadUserProducts();
+                    } else {
+                        $('#sellerPanel')?.classList.add('hidden');
+                        $('#buyerPanel')?.classList.remove('hidden');
+                    }
                 }
             });
         })();
