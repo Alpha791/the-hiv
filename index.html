@@ -5,676 +5,270 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TheHive Kenya - Live Marketplace</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
-          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3H5f+XN46Z37qvB3D2QhN1eVGP2tPrJ5UY0o8+O1sVZ56Aq7nJPSEUgrI+r+oSgvSMf/2wQD5/IQ=="
           crossorigin="anonymous" referrerpolicy="no-referrer">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f8f9fa; }
-        .navbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1rem 2rem; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
-        .card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 1.5rem; }
-        .btn { padding: 0.75rem 1.5rem; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
-        .btn-primary { background: #667eea; color: white; }
-        .btn-primary:hover { background: #5568d3; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
-        .btn-secondary { background: #f0f0f0; color: #333; }
-        .btn-secondary:hover { background: #e0e0e0; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-danger:hover { background: #dc2626; }
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
-        .product-card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); transition: all 0.3s; }
-        .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
-        .product-image { width: 100%; height: 200px; object-fit: cover; background: #f0f0f0; }
-        .product-info { padding: 1rem; }
-        .badge { display: inline-block; padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.875rem; font-weight: 600; }
-        .badge-success { background: #dcfce7; color: #166534; }
-        .badge-warning { background: #fef3c7; color: #92400e; }
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 12px; padding: 2rem; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
-        .form-input, .form-textarea, .form-select { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
-        .form-textarea { resize: vertical; min-height: 100px; }
-        .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 1rem 1.5rem; border-radius: 8px; z-index: 2000; animation: slideIn 0.3s; }
-        .toast.success { background: #10b981; }
-        .toast.error { background: #ef4444; }
-        .loading { text-align: center; padding: 2rem; }
-        .spinner { display: inline-block; width: 40px; height: 40px; border: 4px solid #f0f0f0; border-top: 4px solid #667eea; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes slideIn { from { transform: translateX(400px); } to { transform: translateX(0); } }
+        html { scroll-behavior: smooth; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        .glass { background: rgba(255,255,255,0.95); backdrop-filter: blur(10px); border-radius: 20px; }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        
+        .btn-primary { @apply bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full font-semibold hover:shadow-lg transition; }
+        .btn-secondary { @apply bg-white text-purple-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition; }
+        
+        .nav-bar { @apply fixed top-0 left-0 right-0 glass shadow-lg z-50; }
+        .main-container { @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8; }
+        
+        .loader { @apply inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin; }
+        .toast { position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.9); color: white; padding: 12px 24px; border-radius: 50px; z-index: 9999; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        
         .hidden { display: none !important; }
-        .seller-only { display: none; }
-        .seller-only.visible { display: block; }
-        .nav-item { cursor: pointer; padding: 0.75rem 1.5rem; border-radius: 8px; transition: all 0.3s; }
-        .nav-item:hover { background: rgba(255,255,255,0.2); }
-        .nav-item.active { background: rgba(255,255,255,0.3); }
-        .page { display: none; }
-        .page.active { display: block; }
-        @media (max-width: 768px) { 
-            .container { padding: 1rem; }
-            .grid-3 { grid-template-columns: 1fr; }
-            .navbar { padding: 1rem; }
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
-        <div class="container flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <i class="fas fa-hive text-2xl"></i>
-                <h1 class="text-2xl font-bold">TheHive Kenya</h1>
+    <!-- Navigation -->
+    <nav class="nav-bar py-4">
+        <div class="main-container flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-rocket text-white"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">TheHive<span class="text-purple-600">Kenya</span></h1>
             </div>
-            <div class="flex gap-4">
-                <div class="nav-item active" onclick="showPage('home')"><i class="fas fa-home"></i> Home</div>
-                <div class="nav-item" onclick="showPage('marketplace')"><i class="fas fa-store"></i> Marketplace</div>
-                <div class="nav-item seller-only" onclick="showPage('seller')"><i class="fas fa-video"></i> Sell Live</div>
-                <div class="nav-item" onclick="showPage('profile')"><i class="fas fa-user"></i> Profile</div>
-                <div class="nav-item" id="authToggle" onclick="handleAuthToggle()"><i class="fas fa-sign-in-alt"></i> Login</div>
+            <div class="flex items-center space-x-4">
+                <button id="navMarket" class="text-gray-700 hover:text-purple-600 font-semibold"><i class="fas fa-store mr-2"></i>Market</button>
+                <button id="navSell" class="text-gray-700 hover:text-purple-600 font-semibold seller-only hidden"><i class="fas fa-video mr-2"></i>Go Live</button>
+                <button id="navProfile" class="text-gray-700 hover:text-purple-600 font-semibold"><i class="fas fa-user mr-2"></i>Profile</button>
             </div>
         </div>
     </nav>
 
     <!-- Home Page -->
-    <div id="home" class="page active">
-        <div class="container">
-            <div class="card text-center py-12">
-                <h2 class="text-4xl font-bold mb-4">Welcome to TheHive Kenya</h2>
-                <p class="text-lg text-gray-600 mb-8">Africa's fastest growing marketplace with live video selling</p>
-                <div class="flex gap-4 justify-center">
-                    <button class="btn btn-primary" onclick="showPage('marketplace')"><i class="fas fa-shopping-cart"></i> Explore Products</button>
-                    <button class="btn btn-primary seller-only" onclick="showPage('seller')"><i class="fas fa-video"></i> Start Selling</button>
+    <div id="homePage" class="pt-24 pb-12">
+        <div class="main-container">
+            <!-- Hero Section -->
+            <div class="glass p-8 md:p-12 rounded-2xl mb-12 text-center card-hover">
+                <h2 class="text-5xl font-bold text-gray-800 mb-4">Welcome to TheHive Kenya</h2>
+                <p class="text-xl text-gray-600 mb-8">Africa's fastest growing live marketplace for authentic products</p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button id="exploreBtn" class="btn-primary"><i class="fas fa-shopping-cart mr-2"></i>Explore Products</button>
+                    <button id="startLiveBtn" class="btn-secondary seller-only hidden"><i class="fas fa-video mr-2"></i>Start Selling Live</button>
                 </div>
             </div>
 
-            <div class="grid-3 mt-12">
-                <div class="card text-center">
-                    <i class="fas fa-users text-4xl text-purple-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2">1000+ Sellers</h3>
-                    <p class="text-gray-600">Trusted vendors across Kenya</p>
+            <!-- Features -->
+            <div class="grid md:grid-cols-3 gap-6 mb-12">
+                <div class="glass p-6 rounded-xl text-center card-hover">
+                    <i class="fas fa-users text-4xl text-purple-600 mb-3"></i>
+                    <h3 class="text-xl font-bold text-gray-800">Trusted Sellers</h3>
+                    <p class="text-gray-600 mt-2">Verified & authentic merchants from across Kenya</p>
                 </div>
-                <div class="card text-center">
-                    <i class="fas fa-video text-4xl text-pink-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2">Live Selling</h3>
-                    <p class="text-gray-600">Real-time product demonstrations</p>
+                <div class="glass p-6 rounded-xl text-center card-hover">
+                    <i class="fas fa-video text-4xl text-pink-600 mb-3"></i>
+                    <h3 class="text-xl font-bold text-gray-800">Live Shopping</h3>
+                    <p class="text-gray-600 mt-2">Real-time product demonstrations & interactions</p>
                 </div>
-                <div class="card text-center">
-                    <i class="fas fa-mobile-alt text-4xl text-green-600 mb-4"></i>
-                    <h3 class="text-xl font-bold mb-2">Mobile Ready</h3>
-                    <p class="text-gray-600">Shop anytime, anywhere</p>
+                <div class="glass p-6 rounded-xl text-center card-hover">
+                    <i class="fas fa-shipping-fast text-4xl text-green-600 mb-3"></i>
+                    <h3 class="text-xl font-bold text-gray-800">Fast Delivery</h3>
+                    <p class="text-gray-600 mt-2">Quick nationwide shipping & payment options</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Marketplace Page -->
-    <div id="marketplace" class="page">
-        <div class="container">
-            <div class="card mb-6">
-                <div class="flex gap-4">
-                    <input type="text" id="searchInput" placeholder="Search products..." class="form-input flex-1" onkeyup="filterProducts()">
-                    <select id="categoryFilter" class="form-select w-40" onchange="filterProducts()">
-                        <option value="">All Categories</option>
-                        <option value="electronics">Electronics</option>
-                        <option value="fashion">Fashion</option>
-                        <option value="food">Food & Beverages</option>
-                        <option value="home">Home & Garden</option>
-                        <option value="other">Other</option>
-                    </select>
+    <!-- Market Page -->
+    <div id="marketPage" class="hidden pt-24 pb-12">
+        <div class="main-container">
+            <div class="glass p-6 rounded-xl mb-6">
+                <div class="flex flex-col sm:flex-row gap-4 justify-between items-center">
+                    <h2 class="text-3xl font-bold text-gray-800">Marketplace</h2>
+                    <div class="relative w-full sm:w-64">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                        <input type="text" id="searchInput" placeholder="Search products..." 
+                               class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-600">
+                    </div>
                 </div>
             </div>
 
-            <div id="productsContainer" class="grid-3">
-                <div class="loading"><div class="spinner"></div><p>Loading products...</p></div>
+            <!-- Products Grid -->
+            <div id="productsGrid" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <div class="col-span-full text-center py-12">
+                    <div class="inline-block loader"></div>
+                    <p class="text-white mt-4">Loading products...</p>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Seller Dashboard -->
-    <div id="seller" class="page">
-        <div class="container">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold">Seller Dashboard</h2>
-                <button class="btn btn-primary" onclick="openAddProductModal()"><i class="fas fa-plus"></i> Add Product</button>
-            </div>
+    <!-- Live Page -->
+    <div id="livePage" class="hidden pt-24 pb-12">
+        <div class="main-container">
+            <div class="glass p-8 rounded-xl">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Live Video Studio</h2>
+                <p class="text-gray-600 mb-6">Connect with buyers in real-time and showcase your products</p>
 
-            <!-- Live Session Status -->
-            <div class="card mb-6">
-                <h3 class="text-xl font-bold mb-4">Live Session</h3>
-                <div id="liveSessionStatus" class="text-center">
-                    <p class="text-gray-600 mb-4">Start a live session to showcase your products</p>
-                    <button class="btn btn-primary" id="startLiveBtn" onclick="startLiveSession()"><i class="fas fa-circle"></i> Start Live</button>
-                    <button class="btn btn-danger hidden" id="stopLiveBtn" onclick="stopLiveSession()"><i class="fas fa-stop"></i> Stop Live</button>
+                <div id="notLoggedInLive" class="text-center py-12">
+                    <i class="fas fa-lock text-5xl text-gray-400 mb-4 inline-block"></i>
+                    <p class="text-gray-600 mb-4 text-lg">Please login as a seller to access the live studio</p>
+                    <button id="loginFromLive" class="btn-primary"><i class="fas fa-sign-in-alt mr-2"></i>Login / Register</button>
                 </div>
-            </div>
 
-            <!-- My Products -->
-            <div class="card">
-                <h3 class="text-xl font-bold mb-4">My Products</h3>
-                <div id="myProductsContainer" class="grid-2">
-                    <div class="loading"><div class="spinner"></div><p>Loading your products...</p></div>
+                <div id="liveStudio" class="hidden">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <div class="bg-black rounded-xl overflow-hidden mb-4" style="aspect-ratio: 16/9;">
+                                <video id="liveVideo" autoplay muted playsinline class="w-full h-full object-cover"></video>
+                            </div>
+                            <div class="flex gap-3 justify-center flex-wrap">
+                                <button id="switchCameraBtn" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-full transition">
+                                    <i class="fas fa-sync-alt mr-2"></i>Switch Camera
+                                </button>
+                                <button id="startLiveBroadcastBtn" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-semibold transition">
+                                    <i class="fas fa-circle mr-2"></i>Start Broadcast
+                                </button>
+                                <button id="stopLiveBroadcastBtn" class="bg-gray-600 hover:bg-gray-700 text-white px-6 py-2 rounded-full font-semibold transition hidden">
+                                    <i class="fas fa-stop mr-2"></i>Stop Broadcast
+                                </button>
+                            </div>
+                        </div>
+                        <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-xl">
+                            <h3 class="font-bold text-lg mb-4">Broadcasting Tips</h3>
+                            <ul class="space-y-3 text-sm">
+                                <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Show your products clearly</li>
+                                <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Engage with viewers via comments</li>
+                                <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Use back camera for close-ups</li>
+                                <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Ensure good lighting</li>
+                                <li><i class="fas fa-check-circle text-green-600 mr-2"></i>Test your internet connection</li>
+                            </ul>
+                            <div id="broadcastStatus" class="mt-6 p-4 bg-gray-800 text-white rounded-lg text-center font-semibold">
+                                <span id="broadcastStatusText">⚫ Offline</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Profile Page -->
-    <div id="profile" class="page">
-        <div class="container">
-            <div class="card">
-                <h2 class="text-3xl font-bold mb-6">Profile</h2>
-                <div id="profileContent">
-                    <p class="text-center text-gray-600">Please log in to view your profile</p>
+    <div id="profilePage" class="hidden pt-24 pb-12">
+        <div class="main-container">
+            <div class="glass p-8 rounded-xl">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Account</h2>
+
+                <!-- Not Logged In -->
+                <div id="profileNotLoggedIn" class="text-center py-12">
+                    <i class="fas fa-user-circle text-6xl text-gray-400 mb-6"></i>
+                    <p class="text-gray-600 mb-6 text-lg">Sign in to access your account</p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <button id="loginBtn" class="btn-primary"><i class="fas fa-sign-in-alt mr-2"></i>Login</button>
+                        <button id="registerBtn" class="btn-secondary"><i class="fas fa-user-plus mr-2"></i>Register</button>
+                    </div>
+                </div>
+
+                <!-- Logged In -->
+                <div id="profileLoggedIn" class="hidden">
+                    <div class="text-center mb-8">
+                        <i class="fas fa-user-circle text-6xl text-purple-600 mb-4 inline-block"></i>
+                        <h3 id="profileName" class="text-2xl font-bold text-gray-800"></h3>
+                        <p id="profileEmail" class="text-gray-600"></p>
+                        <p id="profileRole" class="text-sm text-purple-600 font-semibold mt-2"></p>
+                        <button id="logoutBtn" class="mt-4 bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-full transition">
+                            <i class="fas fa-sign-out-alt mr-2"></i>Logout
+                        </button>
+                    </div>
+
+                    <!-- Seller Panel -->
+                    <div id="sellerPanel" class="hidden">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">My Products</h3>
+                        <button id="addProductBtn" class="mb-6 btn-primary">
+                            <i class="fas fa-plus mr-2"></i>Add New Product
+                        </button>
+                        <div id="sellerProducts" class="grid md:grid-cols-2 gap-6">
+                            <div class="col-span-full text-center py-8 text-gray-500">
+                                <p>No products yet. Add your first product to start selling!</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Buyer Panel -->
+                    <div id="buyerPanel" class="hidden">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-4">My Purchases</h3>
+                        <div class="text-center py-12 text-gray-500">
+                            <p>You haven't made any purchases yet.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Add/Edit Product Modal -->
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-4">Add Product</h2>
-            <form id="productForm" onsubmit="handleProductSubmit(event)">
-                <div class="form-group">
-                    <label class="form-label">Product Name</label>
-                    <input type="text" id="productName" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Description</label>
-                    <textarea id="productDesc" class="form-textarea" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Category</label>
-                    <select id="productCategory" class="form-select" required>
-                        <option value="">Select Category</option>
-                        <option value="electronics">Electronics</option>
-                        <option value="fashion">Fashion</option>
-                        <option value="food">Food & Beverages</option>
-                        <option value="home">Home & Garden</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Price (KES)</label>
-                    <input type="number" id="productPrice" class="form-input" min="0" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Image URL</label>
-                    <input type="url" id="productImage" class="form-input" placeholder="https://example.com/image.jpg">
-                </div>
-                <div class="flex gap-4">
-                    <button type="submit" class="btn btn-primary flex-1">Add Product</button>
-                    <button type="button" class="btn btn-secondary flex-1" onclick="closeProductModal()">Cancel</button>
-                </div>
-            </form>
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal-overlay hidden">
+        <div class="glass p-8 rounded-xl max-w-md w-full mx-4">
+            <h3 class="text-2xl font-bold text-gray-800 mb-4">Add New Product</h3>
+            
+            <input type="text" id="productName" placeholder="Product Name" class="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-600">
+            
+            <textarea id="productDescription" placeholder="Product Description" class="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-600 resize-none" rows="3"></textarea>
+            
+            <input type="number" id="productPrice" placeholder="Price (KES)" class="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-600">
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+                <input type="file" id="productImage" accept="image/*" class="w-full border border-gray-300 rounded-lg p-2">
+                <p class="text-xs text-gray-500 mt-1">JPG, PNG or WebP (max 2MB)</p>
+            </div>
+
+            <div class="flex gap-3">
+                <button id="submitProductBtn" class="flex-1 btn-primary">Create</button>
+                <button id="closeProductModal" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-full font-semibold transition">Cancel</button>
+            </div>
         </div>
     </div>
 
     <!-- Auth Modal -->
-    <div id="authModal" class="modal">
-        <div class="modal-content">
-            <h2 class="text-2xl font-bold mb-6">Authentication</h2>
-            <div id="authTabs" class="flex gap-4 mb-6">
-                <button class="btn btn-primary flex-1" id="loginTab" onclick="switchAuthTab('login')">Login</button>
-                <button class="btn btn-secondary flex-1" id="registerTab" onclick="switchAuthTab('register')">Register</button>
+    <div id="authModal" class="modal-overlay hidden">
+        <div class="glass p-8 rounded-xl max-w-md w-full mx-4">
+            <h3 id="authTitle" class="text-2xl font-bold text-gray-800 mb-4">Login</h3>
+            
+            <!-- Login Form -->
+            <div id="loginForm">
+                <input type="email" id="loginEmail" placeholder="Email" class="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                <input type="password" id="loginPassword" placeholder="Password" class="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                <button id="loginSubmitBtn" class="w-full btn-primary mb-3">Login</button>
+                <p class="text-center text-gray-600">Don't have an account? <button id="switchToRegister" class="text-purple-600 font-semibold hover:underline">Register</button></p>
             </div>
 
-            <!-- Login Form -->
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="loginEmail" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="loginPassword" class="form-input" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-full">Login</button>
-            </form>
-
             <!-- Register Form -->
-            <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input type="text" id="regName" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <input type="email" id="regEmail" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Password</label>
-                    <input type="password" id="regPassword" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input type="tel" id="regPhone" class="form-input" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Account Type</label>
-                    <select id="regRole" class="form-select" required>
-                        <option value="buyer">Buyer</option>
-                        <option value="seller">Seller</option>
-                    </select>
-                </div>
-                <div class="form-group hidden seller-field">
-                    <label class="form-label">Store Name</label>
-                    <input type="text" id="regStoreName" class="form-input">
-                </div>
-                <button type="submit" class="btn btn-primary w-full">Register</button>
-            </form>
+            <div id="registerForm" class="hidden">
+                <input type="email" id="registerEmail" placeholder="Email" class="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                <input type="password" id="registerPassword" placeholder="Password (min 6 chars)" class="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                <input type="text" id="registerName" placeholder="Full Name" class="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                <input type="tel" id="registerPhone" placeholder="Phone Number" class="w-full border border-gray-300 rounded-lg p-3 mb-3 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                <select id="registerRole" class="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-600">
+                    <option value="">Select Role</option>
+                    <option value="buyer">Buyer</option>
+                    <option value="seller">Seller</option>
+                </select>
+                <input type="text" id="registerStoreName" placeholder="Store Name (sellers only)" class="w-full border border-gray-300 rounded-lg p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-600 hidden">
+                <button id="registerSubmitBtn" class="w-full btn-primary mb-3">Register</button>
+                <p class="text-center text-gray-600">Already have an account? <button id="switchToLogin" class="text-purple-600 font-semibold hover:underline">Login</button></p>
+            </div>
 
-            <button type="button" class="btn btn-secondary w-full mt-4" onclick="closeAuthModal()">Close</button>
+            <button id="closeAuthModal" class="mt-4 w-full bg-gray-300 hover:bg-gray-400 text-gray-800 px-6 py-3 rounded-full font-semibold transition">Close</button>
         </div>
     </div>
 
-    <script>
-        // Supabase Configuration
-        const SUPABASE_URL = 'https://zdinsgeczlseswpbplhb.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkaW5zZ2VjemxzZXN3cGJwbGhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTczODcyNTksImV4cCI6MjAzMjk2MzI1OX0.HxF_sGDkXyrXblGcJGvjZA_kf2AQpnI';
-
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // State
-        let currentUser = null;
-        let currentRole = null;
-        let allProducts = [];
-        let liveSessionActive = false;
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async () => {
-            await checkAuthStatus();
-            await loadProducts();
-            setupEventListeners();
-        });
-
-        // Auth Status Check
-        async function checkAuthStatus() {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                currentUser = session.user;
-                const { data: profile } = await supabase.from('profiles').select('*').eq('id', session.user.id).single();
-                if (profile) {
-                    currentRole = profile.role;
-                    updateUIForAuth();
-                }
-            }
-        }
-
-        // Handle Auth Toggle
-        function handleAuthToggle() {
-            if (currentUser) {
-                handleLogout();
-            } else {
-                openAuthModal();
-            }
-        }
-
-        // Open Auth Modal
-        function openAuthModal() {
-            document.getElementById('authModal').classList.add('active');
-            switchAuthTab('login');
-        }
-
-        // Close Auth Modal
-        function closeAuthModal() {
-            document.getElementById('authModal').classList.remove('active');
-        }
-
-        // Switch Auth Tab
-        function switchAuthTab(tab) {
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const loginTab = document.getElementById('loginTab');
-            const registerTab = document.getElementById('registerTab');
-
-            if (tab === 'login') {
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
-                loginTab.classList.add('btn-primary');
-                loginTab.classList.remove('btn-secondary');
-                registerTab.classList.remove('btn-primary');
-                registerTab.classList.add('btn-secondary');
-            } else {
-                loginForm.classList.add('hidden');
-                registerForm.classList.remove('hidden');
-                registerTab.classList.add('btn-primary');
-                registerTab.classList.remove('btn-secondary');
-                loginTab.classList.remove('btn-primary');
-                loginTab.classList.add('btn-secondary');
-
-                // Show store name field if seller is selected
-                const roleSelect = document.getElementById('regRole');
-                const sellerFields = document.querySelectorAll('.seller-field');
-                if (roleSelect.value === 'seller') {
-                    sellerFields.forEach(f => f.classList.remove('hidden'));
-                }
-            }
-        }
-
-        // Handle Login
-        async function handleLogin(e) {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-
-            try {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
-
-                currentUser = data.user;
-                const { data: profile } = await supabase.from('profiles').select('*').eq('id', data.user.id).single();
-                currentRole = profile.role;
-
-                closeAuthModal();
-                updateUIForAuth();
-                showToast('Logged in successfully!', 'success');
-                showPage('home');
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
-        }
-
-        // Handle Register
-        async function handleRegister(e) {
-            e.preventDefault();
-            const name = document.getElementById('regName').value;
-            const email = document.getElementById('regEmail').value;
-            const password = document.getElementById('regPassword').value;
-            const phone = document.getElementById('regPhone').value;
-            const role = document.getElementById('regRole').value;
-            const storeName = document.getElementById('regStoreName').value;
-
-            try {
-                const { data, error } = await supabase.auth.signUp({ email, password });
-                if (error) throw error;
-
-                const { error: profileError } = await supabase.from('profiles').insert({
-                    id: data.user.id,
-                    name,
-                    email,
-                    phone,
-                    role,
-                    store_name: role === 'seller' ? storeName : null,
-                    created_at: new Date()
-                });
-
-                if (profileError) throw profileError;
-
-                currentUser = data.user;
-                currentRole = role;
-
-                closeAuthModal();
-                updateUIForAuth();
-                showToast('Registered successfully!', 'success');
-                showPage('home');
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
-        }
-
-        // Handle Logout
-        async function handleLogout() {
-            await supabase.auth.signOut();
-            currentUser = null;
-            currentRole = null;
-            updateUIForAuth();
-            showToast('Logged out successfully!', 'success');
-            showPage('home');
-        }
-
-        // Update UI for Auth Status
-        function updateUIForAuth() {
-            const authToggle = document.getElementById('authToggle');
-            const sellerOnly = document.querySelectorAll('.seller-only');
-
-            if (currentUser) {
-                authToggle.innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
-                if (currentRole === 'seller') {
-                    sellerOnly.forEach(el => el.classList.add('visible'));
-                }
-            } else {
-                authToggle.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
-                sellerOnly.forEach(el => el.classList.remove('visible'));
-            }
-        }
-
-        // Load Products
-        async function loadProducts() {
-            try {
-                const { data, error } = await supabase.from('products').select(`
-                    *,
-                    sellers:seller_id(*)
-                `).order('created_at', { ascending: false });
-
-                if (error) throw error;
-                allProducts = data || [];
-                displayProducts(allProducts);
-                loadMyProducts();
-            } catch (error) {
-                console.error('Error loading products:', error);
-                showToast('Failed to load products', 'error');
-            }
-        }
-
-        // Display Products
-        function displayProducts(products) {
-            const container = document.getElementById('productsContainer');
-            if (products.length === 0) {
-                container.innerHTML = '<div class="col-span-full text-center py-8"><p class="text-gray-600">No products found</p></div>';
-                return;
-            }
-
-            container.innerHTML = products.map(product => `
-                <div class="product-card">
-                    <img src="${product.image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${product.name}" class="product-image">
-                    <div class="product-info">
-                        <h3 class="font-bold text-lg mb-2">${product.name}</h3>
-                        <p class="text-gray-600 text-sm mb-3">${product.description.substring(0, 80)}...</p>
-                        <div class="flex justify-between items-center mb-3">
-                            <span class="text-2xl font-bold text-purple-600">KES ${product.price}</span>
-                            <span class="badge badge-success">${product.category}</span>
-                        </div>
-                        <p class="text-sm text-gray-500 mb-3"><i class="fas fa-store"></i> ${product.sellers?.store_name || 'Seller'}</p>
-                        <button class="btn btn-primary w-full"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Filter Products
-        function filterProducts() {
-            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-            const category = document.getElementById('categoryFilter').value;
-
-            const filtered = allProducts.filter(p => {
-                const matchSearch = p.name.toLowerCase().includes(searchTerm) || p.description.toLowerCase().includes(searchTerm);
-                const matchCategory = !category || p.category === category;
-                return matchSearch && matchCategory;
-            });
-
-            displayProducts(filtered);
-        }
-
-        // Load My Products
-        async function loadMyProducts() {
-            if (!currentUser || currentRole !== 'seller') return;
-
-            try {
-                const { data, error } = await supabase.from('products').select('*').eq('seller_id', currentUser.id);
-                if (error) throw error;
-
-                const container = document.getElementById('myProductsContainer');
-                if (!data || data.length === 0) {
-                    container.innerHTML = '<p class="col-span-full text-center text-gray-600">No products yet. Create your first one!</p>';
-                    return;
-                }
-
-                container.innerHTML = data.map(product => `
-                    <div class="card">
-                        <img src="${product.image_url || 'https://via.placeholder.com/300x200'}" alt="${product.name}" class="w-full h-40 object-cover rounded-lg mb-3">
-                        <h3 class="font-bold text-lg mb-2">${product.name}</h3>
-                        <p class="text-gray-600 text-sm mb-3">${product.description.substring(0, 60)}...</p>
-                        <p class="text-xl font-bold text-purple-600 mb-4">KES ${product.price}</p>
-                        <div class="flex gap-2">
-                            <button class="btn btn-secondary flex-1" onclick="editProduct('${product.id}')"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger flex-1" onclick="deleteProduct('${product.id}')"><i class="fas fa-trash"></i> Delete</button>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error loading my products:', error);
-            }
-        }
-
-        // Open Add Product Modal
-        function openAddProductModal() {
-            if (!currentUser || currentRole !== 'seller') {
-                showToast('Only sellers can add products', 'error');
-                return;
-            }
-            document.getElementById('productForm').reset();
-            document.getElementById('productModal').classList.add('active');
-        }
-
-        // Close Product Modal
-        function closeProductModal() {
-            document.getElementById('productModal').classList.remove('active');
-        }
-
-        // Handle Product Submit
-        async function handleProductSubmit(e) {
-            e.preventDefault();
-
-            const name = document.getElementById('productName').value;
-            const description = document.getElementById('productDesc').value;
-            const category = document.getElementById('productCategory').value;
-            const price = parseFloat(document.getElementById('productPrice').value);
-            const imageUrl = document.getElementById('productImage').value;
-
-            try {
-                const { error } = await supabase.from('products').insert({
-                    seller_id: currentUser.id,
-                    name,
-                    description,
-                    category,
-                    price,
-                    image_url: imageUrl,
-                    created_at: new Date()
-                });
-
-                if (error) throw error;
-
-                closeProductModal();
-                showToast('Product added successfully!', 'success');
-                await loadProducts();
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
-        }
-
-        // Delete Product
-        async function deleteProduct(id) {
-            if (!confirm('Are you sure you want to delete this product?')) return;
-
-            try {
-                const { error } = await supabase.from('products').delete().eq('id', id);
-                if (error) throw error;
-
-                showToast('Product deleted successfully!', 'success');
-                await loadProducts();
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
-        }
-
-        // Live Session
-        async function startLiveSession() {
-            if (!currentUser || currentRole !== 'seller') {
-                showToast('Only sellers can start live sessions', 'error');
-                return;
-            }
-
-            try {
-                const { error } = await supabase.from('live_sessions').insert({
-                    seller_id: currentUser.id,
-                    started_at: new Date(),
-                    status: 'active'
-                });
-
-                if (error) throw error;
-
-                liveSessionActive = true;
-                document.getElementById('startLiveBtn').classList.add('hidden');
-                document.getElementById('stopLiveBtn').classList.remove('hidden');
-                showToast('Live session started!', 'success');
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
-        }
-
-        // Stop Live Session
-        async function stopLiveSession() {
-            try {
-                const { error } = await supabase.from('live_sessions')
-                    .update({ status: 'inactive', ended_at: new Date() })
-                    .eq('seller_id', currentUser.id)
-                    .eq('status', 'active');
-
-                if (error) throw error;
-
-                liveSessionActive = false;
-                document.getElementById('startLiveBtn').classList.remove('hidden');
-                document.getElementById('stopLiveBtn').classList.add('hidden');
-                showToast('Live session ended!', 'success');
-            } catch (error) {
-                showToast(error.message, 'error');
-            }
-        }
-
-        // Show Page
-        function showPage(pageName) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageName).classList.add('active');
-
-            document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-            event.target.closest('.nav-item').classList.add('active');
-
-            if (pageName === 'seller' && (!currentUser || currentRole !== 'seller')) {
-                showToast('Only sellers can access this page', 'error');
-                showPage('home');
-            }
-        }
-
-        // Setup Event Listeners
-        function setupEventListeners() {
-            document.getElementById('regRole').addEventListener('change', (e) => {
-                const sellerFields = document.querySelectorAll('.seller-field');
-                if (e.target.value === 'seller') {
-                    sellerFields.forEach(f => f.classList.remove('hidden'));
-                } else {
-                    sellerFields.forEach(f => f.classList.add('hidden'));
-                }
-            });
-        }
-
-        // Show Toast
-        function showToast(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.textContent = message;
-            document.body.appendChild(toast);
-
-            setTimeout(() => toast.remove(), 3000);
-        }
-
-        // Edit Product (placeholder)
-        function editProduct(id) {
-            showToast('Edit feature coming soon', 'error');
-        }
-    </script>
+    <!-- Supabase & App Scripts -->
+    <script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4"></script>
+    <script src="app.js"></script>
 </body>
 </html>
