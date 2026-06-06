@@ -62,7 +62,7 @@
             <div class="grid md:grid-cols-3 gap-6">
                 <div class="glass-card p-6 text-center"><i class="fas fa-users text-4xl text-purple-600 mb-3"></i><h3 class="text-xl font-bold">500+ Sellers</h3><p class="text-gray-600">Trusted vendors</p></div>
                 <div class="glass-card p-6 text-center"><i class="fas fa-video text-4xl text-pink-600 mb-3"></i><h3 class="text-xl font-bold">Live Selling</h3><p class="text-gray-600">Real-time products</p></div>
-                <div class="glass-card p-6 text-center"><i class="fas fa-mobile-alt text-4xl text-green-600 mb-3"></i><h3 class="text-xl font-bold">Mobile Ready</h3><p class="text-gray-600">Frontend optimized</p></div>
+                <div class="glass-card p-6 text-center"><i class="fas fa-mobile-alt text-4xl text-green-600 mb-3"></i><h3 class="text-xl font-bold">Mobile Ready</h3><p class="text-gray-600">Mobile optimized</p></div>
             </div>
         </div>
 
@@ -71,7 +71,7 @@
             <div class="glass-card p-6 mb-6">
                 <div class="flex flex-wrap gap-4 justify-between items-center">
                     <h2 class="text-2xl font-bold">Marketplace</h2>
-                    <div class="relative"><i class="fas fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg"></div>
+                    <div class="relative"><i class="fas fa-search absolute left-3 top-3 text-gray-400"></i><input type="text" id="searchInput" placeholder="Search products..." class="pl-10 pr-4 py-2 border rounded-full"></div>
                 </div>
             </div>
             <div id="productsContainer" class="grid md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
@@ -99,11 +99,11 @@
                         </div>
                         <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-5 rounded-xl">
                             <h3 class="font-bold text-lg mb-3">Live Tips</h3>
-                            <ul class="space-y-2 text-sm"><li><i class="fas fa-check-circle text-green-600"></i> Switch to back camera to show product details</li><li><i class="fas fa-check-circle text-green-600"></i> Good lighting improves engagement</li></ul>
+                            <ul class="space-y-2 text-sm"><li><i class="fas fa-check-circle text-green-600"></i> Switch to back camera to show product details</li><li><i class="fas fa-check-circle text-green-600"></i> Engage with viewers via chat</li></ul>
                             <div id="liveStatus" class="mt-4 p-3 bg-gray-800 text-white rounded-lg text-center"><span id="liveStatusText">⚫ Offline</span></div>
                         </div>
                     </div>
-                    <div id="activeBroadcast" class="mt-6 hidden"><div class="bg-green-100 border border-green-400 p-3 rounded-lg text-center"><i class="fas fa-broadcast-tower text-red-600"></i> Broadcasting live to marketplace</div></div>
+                    <div id="activeBroadcast" class="mt-6 hidden"><div class="bg-green-100 border border-green-400 p-3 rounded-lg text-center"><i class="fas fa-broadcast-tower text-red-600"></i> Broadcasting live to buyers</div></div>
                 </div>
             </div>
         </div>
@@ -152,7 +152,7 @@
             <div class="mb-4">
                 <label class="block text-sm font-medium text-gray-700 mb-1">Product Image</label>
                 <input type="file" id="prodImage" accept="image/*" class="w-full border rounded-lg p-1">
-                <p class="text-xs text-gray-500 mt-1">Upload image (jpg, png) – stored locally</p>
+                <p class="text-xs text-gray-500 mt-1">Upload image (jpg, png) – max 2MB</p>
             </div>
             <div class="flex gap-3 mt-2">
                 <button id="modalSubmitBtn" class="bg-purple-600 text-white px-4 py-2 rounded-full flex-1">Create Product</button>
@@ -170,6 +170,11 @@
 
     <script>
         (function() {
+            // ---------- CONFIGURATION ----------
+            const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+            const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+            const SEARCH_DEBOUNCE_MS = 300;
+
             // ---------- MOCK BACKEND (localStorage) ----------
             // Initialize data structures if empty
             if (!localStorage.getItem('mock_sellers')) {
@@ -184,15 +189,86 @@
             if (!localStorage.getItem('mock_current_user')) {
                 localStorage.setItem('mock_current_user', 'null');
             }
-            // Helper functions
-            function getSellers() { return JSON.parse(localStorage.getItem('mock_sellers')); }
-            function saveSellers(sellers) { localStorage.setItem('mock_sellers', JSON.stringify(sellers)); }
-            function getBuyers() { return JSON.parse(localStorage.getItem('mock_buyers')); }
-            function saveBuyers(buyers) { localStorage.setItem('mock_buyers', JSON.stringify(buyers)); }
-            function getProducts() { return JSON.parse(localStorage.getItem('mock_products')); }
-            function saveProducts(products) { localStorage.setItem('mock_products', JSON.stringify(products)); }
-            function getCurrentUser() { return JSON.parse(localStorage.getItem('mock_current_user')); }
-            function setCurrentUser(user) { localStorage.setItem('mock_current_user', JSON.stringify(user)); }
+
+            // Helper functions with error handling
+            function getSellers() {
+                try {
+                    return JSON.parse(localStorage.getItem('mock_sellers')) || [];
+                } catch(e) {
+                    console.error('Error reading sellers:', e);
+                    return [];
+                }
+            }
+
+            function saveSellers(sellers) {
+                try {
+                    localStorage.setItem('mock_sellers', JSON.stringify(sellers));
+                    return true;
+                } catch(e) {
+                    console.error('Error saving sellers:', e);
+                    showToast('Storage quota exceeded');
+                    return false;
+                }
+            }
+
+            function getBuyers() {
+                try {
+                    return JSON.parse(localStorage.getItem('mock_buyers')) || [];
+                } catch(e) {
+                    console.error('Error reading buyers:', e);
+                    return [];
+                }
+            }
+
+            function saveBuyers(buyers) {
+                try {
+                    localStorage.setItem('mock_buyers', JSON.stringify(buyers));
+                    return true;
+                } catch(e) {
+                    console.error('Error saving buyers:', e);
+                    showToast('Storage quota exceeded');
+                    return false;
+                }
+            }
+
+            function getProducts() {
+                try {
+                    return JSON.parse(localStorage.getItem('mock_products')) || [];
+                } catch(e) {
+                    console.error('Error reading products:', e);
+                    return [];
+                }
+            }
+
+            function saveProducts(products) {
+                try {
+                    localStorage.setItem('mock_products', JSON.stringify(products));
+                    return true;
+                } catch(e) {
+                    console.error('Error saving products:', e);
+                    showToast('Storage quota exceeded');
+                    return false;
+                }
+            }
+
+            function getCurrentUser() {
+                try {
+                    return JSON.parse(localStorage.getItem('mock_current_user'));
+                } catch(e) {
+                    console.error('Error reading current user:', e);
+                    return null;
+                }
+            }
+
+            function setCurrentUser(user) {
+                try {
+                    localStorage.setItem('mock_current_user', JSON.stringify(user));
+                    return true;
+                } catch(e) {
+                    console.error('Error saving current user:', e);
+                    return false;
+                }
+            }
 
             // App state
             let currentUser = getCurrentUser();
@@ -200,9 +276,11 @@
             let products = getProducts();
             let liveStream = null;
             let currentCamera = 'user';
+            let searchTimeout = null;
 
             // DOM helpers
             function $(id) { return document.getElementById(id); }
+
             function showToast(msg) {
                 let toast = document.querySelector('.toast');
                 if(toast) toast.remove();
@@ -212,6 +290,7 @@
                 document.body.appendChild(toast);
                 setTimeout(() => toast.remove(), 3000);
             }
+
             function showPage(page) {
                 const pages = ['homePage', 'marketPage', 'livePage', 'profilePage'];
                 pages.forEach(p => {
@@ -222,42 +301,78 @@
                 if(target) target.classList.remove('hidden');
                 else console.error("Page not found:", page + 'Page');
             }
+
             function updateUIBasedOnRole() {
                 const sellerOnly = document.querySelectorAll('.seller-only');
-                if(currentRole === 'seller') sellerOnly.forEach(el => el.classList.remove('hidden'));
-                else sellerOnly.forEach(el => el.classList.add('hidden'));
+                if(currentRole === 'seller') {
+                    sellerOnly.forEach(el => el.classList.remove('hidden'));
+                } else {
+                    sellerOnly.forEach(el => el.classList.add('hidden'));
+                }
             }
-            function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
+
+            function escapeHtml(str) {
+                if(!str) return '';
+                return str.replace(/[&<>"']/g, m => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#x27;'
+                })[m]);
+            }
+
+            // Input validation
+            function validateImageFile(file) {
+                if (!file) return { valid: true };
+                if (file.size > MAX_IMAGE_SIZE) {
+                    return { valid: false, error: 'Image too large. Max 2MB.' };
+                }
+                if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+                    return { valid: false, error: 'Invalid image type. Use JPG, PNG, or WebP.' };
+                }
+                return { valid: true };
+            }
+
+            function sanitizeInput(str) {
+                if(!str) return '';
+                return String(str).trim().substring(0, 1000); // Max 1000 chars
+            }
 
             // Render marketplace products
             function renderProducts() {
                 const container = $('#productsContainer');
                 if(!container) return;
-                const searchTerm = $('#searchInput')?.value.toLowerCase() || '';
-                const filtered = products.filter(p => 
-                    p.name.toLowerCase().includes(searchTerm) || p.description.toLowerCase().includes(searchTerm)
-                );
+                const searchTerm = $('#searchInput')?.value?.toLowerCase() || '';
+                const filtered = products.filter(p => {
+                    const name = (p.name || '').toLowerCase();
+                    const desc = (p.description || '').toLowerCase();
+                    return name.includes(searchTerm) || desc.includes(searchTerm);
+                });
+
                 if(filtered.length === 0) {
                     container.innerHTML = '<div class="col-span-full text-center py-10"><i class="fas fa-box-open text-4xl text-gray-400"></i><p class="text-gray-500">No products found</p></div>';
                     return;
                 }
+
                 // Get seller info for each product
                 const sellers = getSellers();
                 container.innerHTML = filtered.map(p => {
                     const seller = sellers.find(s => s.id === p.sellerId);
                     return `
                         <div class="product-card p-4">
-                            <img src="${p.imageUrl || 'https://picsum.photos/300/200'}" class="w-full h-48 object-cover rounded-lg mb-3" onerror="this.src='https://picsum.photos/300/200'">
+                            <img src="${p.imageUrl || 'https://picsum.photos/300/200'}" class="w-full h-48 object-cover rounded-lg mb-3" onerror="this.src='https://picsum.photos/300/200'" alt="${escapeHtml(p.name)}">
                             <h3 class="font-bold text-lg">${escapeHtml(p.name)}</h3>
-                            <p class="text-gray-500 text-sm">${escapeHtml(p.description.substring(0,80))}</p>
+                            <p class="text-gray-500 text-sm">${escapeHtml((p.description || '').substring(0,80))}</p>
                             <div class="flex justify-between items-center mt-3">
                                 <span class="text-purple-600 font-bold text-xl">KES ${p.price}</span>
-                                <button class="viewSellerBtn text-blue-600 text-sm" data-seller="${p.sellerId}">View Seller</button>
+                                <button class="viewSellerBtn text-blue-600 text-sm" data-seller="${escapeHtml(p.sellerId)}">View Seller</button>
                             </div>
                             <div class="mt-2 text-xs text-gray-500"><i class="fas fa-store"></i> ${escapeHtml(seller?.storeName || 'Seller')}</div>
                         </div>
                     `;
                 }).join('');
+
                 document.querySelectorAll('.viewSellerBtn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const sellerId = btn.dataset.seller;
@@ -278,27 +393,32 @@
                 const myProducts = products.filter(p => p.sellerId === currentUser.id);
                 const container = $('#myProductsList');
                 if(!container) return;
+
                 if(myProducts.length === 0) {
                     container.innerHTML = '<p class="text-gray-500 text-center">No products yet. Add your first product!</p>';
                     return;
                 }
+
                 container.innerHTML = myProducts.map(p => `
                     <div class="flex gap-3 bg-gray-50 p-3 rounded-lg">
-                        <img src="${p.imageUrl || 'https://picsum.photos/60/60'}" class="w-16 h-16 rounded-lg object-cover">
+                        <img src="${p.imageUrl || 'https://picsum.photos/60/60'}" class="w-16 h-16 rounded-lg object-cover" alt="${escapeHtml(p.name)}">
                         <div class="flex-1"><p class="font-semibold">${escapeHtml(p.name)}</p><p class="text-sm text-gray-600">KES ${p.price}</p></div>
-                        <button class="deleteProduct text-red-500" data-id="${p.id}"><i class="fas fa-trash"></i></button>
+                        <button class="deleteProduct text-red-500" data-id="${escapeHtml(p.id)}"><i class="fas fa-trash"></i></button>
                     </div>
                 `).join('');
+
                 container.querySelectorAll('.deleteProduct').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.preventDefault();
                         if(confirm('Delete product?')) {
-                            const newProducts = products.filter(p => p.id != btn.dataset.id);
-                            saveProducts(newProducts);
-                            products = newProducts;
-                            loadUserProducts();
-                            loadProductsAndRender();
-                            showToast('Product deleted');
+                            const productId = btn.dataset.id;
+                            const newProducts = products.filter(p => p.id !== productId);
+                            if(saveProducts(newProducts)) {
+                                products = newProducts;
+                                loadUserProducts();
+                                loadProductsAndRender();
+                                showToast('Product deleted');
+                            }
                         }
                     });
                 });
@@ -306,40 +426,73 @@
 
             function addProduct(name, description, price, imageFile) {
                 return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        const imageUrl = e.target.result; // base64
-                        const newProduct = {
-                            id: Date.now().toString(),
-                            sellerId: currentUser.id,
-                            name: name,
-                            description: description,
-                            price: parseInt(price),
-                            imageUrl: imageUrl
-                        };
-                        const updated = [...products, newProduct];
-                        saveProducts(updated);
-                        products = updated;
-                        resolve();
+                    // Validate inputs
+                    if(!name || !price) {
+                        reject(new Error('Name and price required'));
+                        return;
+                    }
+
+                    const newProduct = {
+                        id: Date.now().toString(),
+                        sellerId: currentUser.id,
+                        name: sanitizeInput(name),
+                        description: sanitizeInput(description),
+                        price: parseInt(price),
+                        imageUrl: 'https://picsum.photos/300/200'
                     };
-                    reader.onerror = reject;
-                    if (imageFile) reader.readAsDataURL(imageFile);
-                    else {
-                        newProduct.imageUrl = 'https://picsum.photos/300/200';
-                        const updated = [...products, newProduct];
-                        saveProducts(updated);
-                        products = updated;
-                        resolve();
+
+                    if (imageFile) {
+                        const validation = validateImageFile(imageFile);
+                        if (!validation.valid) {
+                            reject(new Error(validation.error));
+                            return;
+                        }
+
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            try {
+                                newProduct.imageUrl = e.target.result;
+                                const updated = [...products, newProduct];
+                                if(saveProducts(updated)) {
+                                    products = updated;
+                                    resolve();
+                                } else {
+                                    reject(new Error('Failed to save product'));
+                                }
+                            } catch(err) {
+                                reject(err);
+                            }
+                        };
+                        reader.onerror = () => reject(new Error('Failed to read image'));
+                        reader.readAsDataURL(imageFile);
+                    } else {
+                        try {
+                            const updated = [...products, newProduct];
+                            if(saveProducts(updated)) {
+                                products = updated;
+                                resolve();
+                            } else {
+                                reject(new Error('Failed to save product'));
+                            }
+                        } catch(err) {
+                            reject(err);
+                        }
                     }
                 });
             }
 
             // Live stream handlers
             async function startLiveStream() {
-                if(!currentUser || currentRole !== 'seller') { alert('Only sellers can go live'); return; }
+                if(!currentUser || currentRole !== 'seller') {
+                    alert('Only sellers can go live');
+                    return;
+                }
                 try {
                     if(liveStream) liveStream.getTracks().forEach(t => t.stop());
-                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentCamera } }, audio: true });
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: { exact: currentCamera } },
+                        audio: true
+                    });
                     liveStream = stream;
                     const localVideo = $('#localVideo');
                     if(localVideo) localVideo.srcObject = stream;
@@ -349,10 +502,16 @@
                     const liveStatusText = $('#liveStatusText');
                     if(liveStatusText) liveStatusText.innerHTML = '🔴 LIVE NOW - Broadcasting';
                     showToast('You are now LIVE!');
-                } catch(err) { alert('Camera access denied: ' + err.message); }
+                } catch(err) {
+                    alert('Camera access denied: ' + err.message);
+                }
             }
+
             async function stopLiveStream() {
-                if(liveStream) { liveStream.getTracks().forEach(t => t.stop()); liveStream = null; }
+                if(liveStream) {
+                    liveStream.getTracks().forEach(t => t.stop());
+                    liveStream = null;
+                }
                 const localVideo = $('#localVideo');
                 if(localVideo) localVideo.srcObject = null;
                 $('#startLiveBtn')?.classList.remove('hidden');
@@ -362,6 +521,7 @@
                 if(liveStatusText) liveStatusText.innerHTML = '⚫ Offline';
                 showToast('Live stream ended');
             }
+
             async function switchCamera() {
                 currentCamera = currentCamera === 'user' ? 'environment' : 'user';
                 if(liveStream) {
@@ -369,14 +529,22 @@
                     await startLiveStream();
                 } else {
                     try {
-                        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { exact: currentCamera } }, audio: false });
+                        const stream = await navigator.mediaDevices.getUserMedia({
+                            video: { facingMode: { exact: currentCamera } },
+                            audio: false
+                        });
                         const localVideo = $('#localVideo');
                         if(localVideo) {
-                            if(localVideo.srcObject) localVideo.srcObject.getTracks().forEach(t => t.stop());
+                            if(localVideo.srcObject) {
+                                localVideo.srcObject.getTracks().forEach(t => t.stop());
+                            }
                             localVideo.srcObject = stream;
                             liveStream = stream;
                         }
-                    } catch(err) { showToast('Camera switch failed'); }
+                    } catch(err) {
+                        console.error('Camera switch failed:', err);
+                        showToast('Camera switch failed');
+                    }
                 }
                 showToast(currentCamera === 'environment' ? 'Back camera active' : 'Front camera active');
             }
@@ -384,32 +552,62 @@
             // Auth functions (mock)
             function handleRegister() {
                 const role = prompt('Are you a Seller or Buyer? (Enter "seller" or "buyer")');
-                if(!role || (role !== 'seller' && role !== 'buyer')) { alert('Please choose seller or buyer'); return; }
+                if(!role || (role.toLowerCase() !== 'seller' && role.toLowerCase() !== 'buyer')) {
+                    alert('Please choose seller or buyer');
+                    return;
+                }
                 const email = prompt('Enter email:');
                 const password = prompt('Enter password (min 6 chars):');
                 const fullName = prompt('Your full name:');
                 const mobile = prompt('Mobile number:');
                 let storeName = null;
-                if(role === 'seller') storeName = prompt('Store/Business name:');
-                if(!email || !password || !fullName || !mobile) { alert('All fields required'); return; }
-                // Check if email exists
+                if(role.toLowerCase() === 'seller') storeName = prompt('Store/Business name:');
+
+                if(!email || !password || !fullName || !mobile) {
+                    alert('All fields required');
+                    return;
+                }
+
+                if(password.length < 6) {
+                    alert('Password must be at least 6 characters');
+                    return;
+                }
+
                 const sellers = getSellers();
                 const buyers = getBuyers();
                 if(sellers.find(s => s.email === email) || buyers.find(b => b.email === email)) {
                     alert('Email already registered');
                     return;
                 }
+
                 const id = Date.now().toString();
-                if(role === 'seller') {
-                    const newSeller = { id, email, password, fullName, mobile, storeName, role: 'seller' };
+                if(role.toLowerCase() === 'seller') {
+                    const newSeller = {
+                        id,
+                        email: sanitizeInput(email),
+                        password: sanitizeInput(password), // Note: this is a mock - never store passwords in plaintext in production!
+                        fullName: sanitizeInput(fullName),
+                        mobile: sanitizeInput(mobile),
+                        storeName: sanitizeInput(storeName),
+                        role: 'seller'
+                    };
                     sellers.push(newSeller);
-                    saveSellers(sellers);
-                    alert('Registration successful! Please login.');
+                    if(saveSellers(sellers)) {
+                        alert('Registration successful! Please login.');
+                    }
                 } else {
-                    const newBuyer = { id, email, password, fullName, mobile, role: 'buyer' };
+                    const newBuyer = {
+                        id,
+                        email: sanitizeInput(email),
+                        password: sanitizeInput(password),
+                        fullName: sanitizeInput(fullName),
+                        mobile: sanitizeInput(mobile),
+                        role: 'buyer'
+                    };
                     buyers.push(newBuyer);
-                    saveBuyers(buyers);
-                    alert('Registration successful! Please login.');
+                    if(saveBuyers(buyers)) {
+                        alert('Registration successful! Please login.');
+                    }
                 }
             }
 
@@ -417,15 +615,22 @@
                 const email = prompt('Enter email:');
                 const password = prompt('Enter password:');
                 if(!email || !password) return;
+
                 const sellers = getSellers();
                 const buyers = getBuyers();
                 let user = sellers.find(u => u.email === email && u.password === password);
                 let role = 'seller';
+
                 if(!user) {
                     user = buyers.find(u => u.email === email && u.password === password);
                     role = 'buyer';
                 }
-                if(!user) { alert('Invalid email or password'); return; }
+
+                if(!user) {
+                    alert('Invalid email or password');
+                    return;
+                }
+
                 currentUser = {
                     id: user.id,
                     email: user.email,
@@ -435,26 +640,33 @@
                     mobile: user.mobile
                 };
                 currentRole = currentUser.role;
-                setCurrentUser(currentUser);
-                // Update UI
-                $('#profileLoggedOut')?.classList.add('hidden');
-                $('#profileLoggedIn')?.classList.remove('hidden');
-                $('#userStoreName').innerText = currentUser.store_name || 'N/A';
-                $('#userFullName').innerText = currentUser.full_name;
-                const userMobileSpan = $('#userMobile')?.querySelector('span');
-                if(userMobileSpan) userMobileSpan.innerText = currentUser.mobile;
-                $('#userRole').innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
-                if(currentRole === 'seller') {
-                    $('#sellerPanel')?.classList.remove('hidden');
-                    $('#buyerPanel')?.classList.add('hidden');
-                    loadUserProducts();
-                } else {
-                    $('#sellerPanel')?.classList.add('hidden');
-                    $('#buyerPanel')?.classList.remove('hidden');
+
+                if(setCurrentUser(currentUser)) {
+                    // Update UI
+                    $('#profileLoggedOut')?.classList.add('hidden');
+                    $('#profileLoggedIn')?.classList.remove('hidden');
+                    const userStoreName = $('#userStoreName');
+                    if(userStoreName) userStoreName.innerText = currentUser.store_name || 'N/A';
+                    const userFullName = $('#userFullName');
+                    if(userFullName) userFullName.innerText = currentUser.full_name;
+                    const userMobileSpan = $('#userMobile')?.querySelector('span');
+                    if(userMobileSpan) userMobileSpan.innerText = currentUser.mobile;
+                    const userRole = $('#userRole');
+                    if(userRole) userRole.innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
+
+                    if(currentRole === 'seller') {
+                        $('#sellerPanel')?.classList.remove('hidden');
+                        $('#buyerPanel')?.classList.add('hidden');
+                        loadUserProducts();
+                    } else {
+                        $('#sellerPanel')?.classList.add('hidden');
+                        $('#buyerPanel')?.classList.remove('hidden');
+                    }
+
+                    updateUIBasedOnRole();
+                    alert(`Welcome ${currentUser.full_name}!`);
+                    showPage('home');
                 }
-                updateUIBasedOnRole();
-                alert(`Welcome ${currentUser.full_name}!`);
-                showPage('home');
             }
 
             function handleLogout() {
@@ -471,9 +683,15 @@
             // Event listeners
             document.addEventListener('DOMContentLoaded', () => {
                 $('#homeBtn')?.addEventListener('click', () => showPage('home'));
-                $('#marketBtn')?.addEventListener('click', () => { showPage('market'); loadProductsAndRender(); });
+                $('#marketBtn')?.addEventListener('click', () => {
+                    showPage('market');
+                    loadProductsAndRender();
+                });
                 $('#sellBtn')?.addEventListener('click', () => {
-                    if(currentRole !== 'seller') { alert('Only sellers can access live studio'); return; }
+                    if(currentRole !== 'seller') {
+                        alert('Only sellers can access live studio');
+                        return;
+                    }
                     showPage('live');
                     if(currentUser) {
                         $('#authRequired')?.classList.add('hidden');
@@ -486,9 +704,15 @@
                 $('#profileBtn')?.addEventListener('click', () => showPage('profile'));
 
                 document.querySelector('.mobile-home')?.addEventListener('click', () => showPage('home'));
-                document.querySelector('.mobile-market')?.addEventListener('click', () => { showPage('market'); loadProductsAndRender(); });
+                document.querySelector('.mobile-market')?.addEventListener('click', () => {
+                    showPage('market');
+                    loadProductsAndRender();
+                });
                 document.querySelector('.mobile-live')?.addEventListener('click', () => {
-                    if(currentRole !== 'seller') { alert('Only sellers can access live studio'); return; }
+                    if(currentRole !== 'seller') {
+                        alert('Only sellers can access live studio');
+                        return;
+                    }
                     showPage('live');
                     if(currentUser) {
                         $('#authRequired')?.classList.add('hidden');
@@ -504,10 +728,23 @@
                 $('#startLiveBtn')?.addEventListener('click', startLiveStream);
                 $('#stopLiveBtn')?.addEventListener('click', stopLiveStream);
                 $('#switchCamBtn')?.addEventListener('click', switchCamera);
-                $('#searchInput')?.addEventListener('input', () => renderProducts());
-                document.querySelector('.exploreBtn')?.addEventListener('click', () => { showPage('market'); loadProductsAndRender(); });
+
+                // Debounced search
+                $('#searchInput')?.addEventListener('input', () => {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => renderProducts(), SEARCH_DEBOUNCE_MS);
+                });
+
+                document.querySelector('.exploreBtn')?.addEventListener('click', () => {
+                    showPage('market');
+                    loadProductsAndRender();
+                });
                 document.querySelector('.startSellingBtn')?.addEventListener('click', () => {
-                    if(currentRole !== 'seller') { alert('Please register as a seller to start live selling'); showPage('profile'); return; }
+                    if(currentRole !== 'seller') {
+                        alert('Please register as a seller to start live selling');
+                        showPage('profile');
+                        return;
+                    }
                     showPage('live');
                     if(currentUser) {
                         $('#authRequired')?.classList.add('hidden');
@@ -526,43 +763,63 @@
                 const submitProductBtn = $('#modalSubmitBtn');
 
                 showAddBtn?.addEventListener('click', () => {
-                    if(!currentUser || currentRole !== 'seller') { alert('Only sellers can add products'); return; }
+                    if(!currentUser || currentRole !== 'seller') {
+                        alert('Only sellers can add products');
+                        return;
+                    }
                     modal?.classList.remove('hidden');
                     $('#prodName').value = '';
                     $('#prodDesc').value = '';
                     $('#prodPrice').value = '';
                     $('#prodImage').value = '';
                 });
+
                 closeModalBtn?.addEventListener('click', () => modal?.classList.add('hidden'));
-                modal?.addEventListener('click', (e) => { if(e.target === modal) modal.classList.add('hidden'); });
+
+                modal?.addEventListener('click', (e) => {
+                    if(e.target === modal) modal.classList.add('hidden');
+                });
+
                 submitProductBtn?.addEventListener('click', async () => {
-                    const name = $('#prodName')?.value.trim();
-                    const desc = $('#prodDesc')?.value.trim();
+                    const name = $('#prodName')?.value?.trim();
+                    const desc = $('#prodDesc')?.value?.trim();
                     const price = $('#prodPrice')?.value;
-                    const imageFile = $('#prodImage')?.files[0];
-                    if(!name || !price) { alert('Name and price required'); return; }
+                    const imageFile = $('#prodImage')?.files?.[0];
+
+                    if(!name || !price) {
+                        alert('Name and price required');
+                        return;
+                    }
+
                     try {
                         await addProduct(name, desc, price, imageFile);
                         modal?.classList.add('hidden');
                         loadUserProducts();
                         loadProductsAndRender();
                         showToast('Product added successfully!');
-                    } catch(err) { alert('Error adding product: ' + err.message); }
+                    } catch(err) {
+                        alert('Error adding product: ' + (err?.message || 'Unknown error'));
+                    }
                 });
 
                 // Initial render
                 loadProductsAndRender();
                 showPage('home');
                 updateUIBasedOnRole();
+
                 // If already logged in (from localStorage), update profile UI
                 if(currentUser) {
                     $('#profileLoggedOut')?.classList.add('hidden');
                     $('#profileLoggedIn')?.classList.remove('hidden');
-                    $('#userStoreName').innerText = currentUser.store_name || 'N/A';
-                    $('#userFullName').innerText = currentUser.full_name;
+                    const userStoreName = $('#userStoreName');
+                    if(userStoreName) userStoreName.innerText = currentUser.store_name || 'N/A';
+                    const userFullName = $('#userFullName');
+                    if(userFullName) userFullName.innerText = currentUser.full_name;
                     const userMobileSpan = $('#userMobile')?.querySelector('span');
                     if(userMobileSpan) userMobileSpan.innerText = currentUser.mobile;
-                    $('#userRole').innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
+                    const userRole = $('#userRole');
+                    if(userRole) userRole.innerText = currentRole === 'seller' ? 'Seller Account' : 'Buyer Account';
+
                     if(currentRole === 'seller') {
                         $('#sellerPanel')?.classList.remove('hidden');
                         $('#buyerPanel')?.classList.add('hidden');
