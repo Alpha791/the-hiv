@@ -2,7 +2,7 @@
 // SUPABASE CONFIGURATION
 // ============================================
 const SUPABASE_URL = 'https://zdinsgeczlseswpbplhb.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkaW5zZ2VjemxzZXN3cGJwbGhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDAwMDAwMDAsImV4cCI6MTk5OTk5OTk5OX0.sb_publishable_HxF_sGDkXyrXblGcJGvjZA_kf2AQpnI';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkaW5zZ2VjemxzZXN3cGJwbGhiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjcwNjIsImV4cCI6MjA5NTMwMzA2Mn0.tf7rnyUT_Ax0OKfh9Mbtil0Dawiu26fvJsBLNP6Dq-E';
 
 let supabase;
 let currentUser = null;
